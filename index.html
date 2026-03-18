@@ -1,0 +1,2666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Shane the Taxman</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans:wght@400;600;700&display=swap');
+
+:root {
+  --bg: #0c0f1e;
+  --panel: #131929;
+  --panel2: #1a2236;
+  --border: #1e3358;
+  --accent: #4fc3f7;
+  --gold: #fbbf24;
+  --danger: #f87171;
+  --heal: #4ade80;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --pixel: 'Press Start 2P', monospace;
+  --vt: 'VT323', monospace;
+  --sans: 'Noto Sans', sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 15% 40%,rgba(79,195,247,0.06) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 15%,rgba(251,191,36,0.04) 0%,transparent 50%),
+    repeating-linear-gradient(0deg,transparent,transparent 32px,rgba(79,195,247,0.018) 32px,rgba(79,195,247,0.018) 33px),
+    repeating-linear-gradient(90deg,transparent,transparent 32px,rgba(79,195,247,0.018) 32px,rgba(79,195,247,0.018) 33px);
+  overflow-x:hidden;
+}
+
+#app{max-width:480px;margin:0 auto;padding:12px;min-height:100vh;}
+
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ═══ PIXEL TEXT ═══ */
+.px{font-family:var(--pixel);line-height:1.8;}
+.vt{font-family:var(--vt);}
+
+/* ═══ TITLE ═══ */
+#title-screen{text-align:center;padding:32px 8px;}
+.title-main{
+  font-family:var(--pixel);
+  font-size:clamp(1.1rem,5vw,1.6rem);
+  color:var(--gold);
+  text-shadow:3px 3px 0 #78350f,0 0 40px rgba(251,191,36,0.5);
+  line-height:1.6;
+  margin-bottom:6px;
+  animation:titlepulse 2.5s ease-in-out infinite;
+}
+@keyframes titlepulse{
+  0%,100%{text-shadow:3px 3px 0 #78350f,0 0 30px rgba(251,191,36,0.4);}
+  50%{text-shadow:3px 3px 0 #78350f,0 0 60px rgba(251,191,36,0.8);}
+}
+.title-sub{font-family:var(--vt);color:var(--accent);font-size:1.1rem;letter-spacing:4px;margin-bottom:28px;}
+
+.title-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:18px;margin-bottom:16px;text-align:left;
+}
+.title-card h3{font-family:var(--pixel);color:var(--gold);font-size:0.5rem;line-height:1.8;margin-bottom:10px;}
+.title-card p{font-size:0.82rem;color:var(--muted);line-height:1.75;}
+.title-card p b{color:var(--text);}
+
+.diff-row{display:flex;gap:8px;margin-bottom:24px;justify-content:center;}
+.diff-btn{
+  flex:1;max-width:130px;
+  background:var(--panel);border:2px solid var(--border);
+  border-radius:8px;padding:12px 6px;cursor:pointer;
+  transition:all 0.15s;text-align:center;
+}
+.diff-btn:hover,.diff-btn.active{border-color:var(--gold);background:var(--panel2);}
+.diff-btn .diff-icon{font-size:1.4rem;margin-bottom:4px;}
+.diff-btn .diff-name{font-family:var(--pixel);font-size:0.38rem;color:var(--gold);line-height:1.8;}
+.diff-btn .diff-desc{font-size:0.7rem;color:var(--muted);margin-top:4px;}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  font-family:var(--pixel);font-size:0.45rem;line-height:1.8;
+  padding:10px 18px;border:none;border-radius:6px;
+  cursor:pointer;transition:all 0.15s;letter-spacing:1px;
+  touch-action:manipulation;
+}
+.btn-gold{background:linear-gradient(135deg,#92400e,#f59e0b,#fbbf24);color:#000;box-shadow:0 3px 16px rgba(251,191,36,0.35);}
+.btn-gold:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 24px rgba(251,191,36,0.55);}
+.btn-gold:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-blue{background:linear-gradient(135deg,#0e4e7a,#0284c7,#38bdf8);color:#000;box-shadow:0 3px 16px rgba(56,189,248,0.3);}
+.btn-blue:hover:not(:disabled){transform:translateY(-1px);}
+.btn-sm{padding:7px 12px;font-size:0.38rem;}
+.btn-danger{background:#450a0a;color:#fca5a5;border:1px solid #dc2626;font-family:var(--pixel);font-size:0.38rem;padding:7px 12px;border-radius:4px;cursor:pointer;}
+
+/* ═══ SQUAD SELECT ═══ */
+#squad-screen{}
+.squad-header{text-align:center;margin-bottom:12px;}
+.squad-header h2{font-family:var(--pixel);color:var(--gold);font-size:0.65rem;line-height:1.8;}
+.squad-header p{font-size:0.75rem;color:var(--muted);margin-top:4px;}
+
+/* order slots */
+.order-section{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:12px;margin-bottom:12px;
+}
+.order-section h4{font-family:var(--pixel);color:var(--accent);font-size:0.4rem;line-height:1.8;margin-bottom:10px;}
+.order-slots{display:flex;gap:8px;justify-content:center;}
+.order-slot{
+  flex:1;max-width:130px;min-height:80px;
+  background:#080d18;border:2px dashed #1e3358;
+  border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:8px 4px;text-align:center;position:relative;
+  transition:border-color 0.2s;
+}
+.order-slot.filled{border-style:solid;border-color:var(--gold);}
+.order-slot .sl-num{font-family:var(--pixel);font-size:0.32rem;color:var(--muted);line-height:1.8;margin-bottom:2px;}
+.order-slot .sl-name{font-family:var(--pixel);font-size:0.3rem;color:var(--gold);line-height:1.8;margin-top:3px;}
+.order-slot .sl-empty{font-size:0.68rem;color:var(--muted);}
+.order-slot .sl-remove{
+  position:absolute;top:4px;right:6px;
+  color:var(--danger);font-size:0.85rem;
+  background:none;border:none;cursor:pointer;line-height:1;
+}
+.order-slot canvas{image-rendering:pixelated;}
+
+/* roster */
+.roster-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.agent-row{
+  background:var(--panel);border:2px solid var(--border);
+  border-radius:10px;padding:11px 12px;cursor:pointer;
+  transition:all 0.15s;display:flex;align-items:center;gap:10px;
+}
+.agent-row:hover{border-color:var(--accent);}
+.agent-row.selected{border-color:var(--gold);background:var(--panel2);}
+.agent-row .ar-sprite{flex-shrink:0;}
+.agent-row canvas{image-rendering:pixelated;}
+.agent-row .ar-info{flex:1;min-width:0;}
+.agent-row .ar-name{font-family:var(--pixel);font-size:0.38rem;color:var(--gold);line-height:1.8;}
+.agent-row .ar-role{font-size:0.65rem;color:var(--accent);margin-bottom:4px;}
+.agent-row .ar-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;}
+.role-tag{
+  font-size:0.6rem;padding:1px 6px;border-radius:3px;
+  font-weight:600;white-space:nowrap;
+}
+.tag-attack{background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);}
+.tag-heal{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+.tag-debuff{background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);}
+.tag-buff{background:rgba(79,195,247,0.15);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3);}
+.tag-control{background:rgba(167,139,250,0.15);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);}
+.tag-support{background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(34,211,153,0.3);}
+.tag-summon{background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3);}
+.agent-row .ar-skills{font-size:0.65rem;color:var(--muted);line-height:1.6;}
+.agent-row .ar-check{
+  font-size:1rem;color:var(--gold);flex-shrink:0;
+  opacity:0;transition:opacity 0.15s;
+}
+.agent-row.selected .ar-check{opacity:1;}
+
+/* HP bar on roster cards */
+.ar-hp-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.ar-hp-label{font-family:var(--vt);font-size:0.78rem;color:var(--muted);white-space:nowrap;}
+.ar-hp-bar{flex:1;height:5px;background:#0f1a2e;border-radius:2px;overflow:hidden;}
+.ar-hp-fill{height:100%;background:#22c55e;border-radius:2px;}
+
+/* roster card layout */
+.ar-name-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:1px;}
+.ar-hp-num{font-family:var(--vt);font-size:0.85rem;color:#4ade80;white-space:nowrap;flex-shrink:0;}
+
+/* skills block */
+.ar-skills-block{margin-top:5px;border-top:1px solid #1e3358;padding-top:5px;}
+.ar-skill-item{display:flex;align-items:center;gap:5px;padding:1px 0;}
+.ar-skill-icon{font-size:0.8rem;flex-shrink:0;}
+.ar-skill-name{font-family:var(--pixel);font-size:0.28rem;color:var(--gold);line-height:1.8;flex:1;}
+.ar-skill-cost{font-family:var(--pixel);font-size:0.26rem;color:var(--accent);white-space:nowrap;}
+.ar-skills-toggle{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:0.62rem;padding:3px 0;
+  display:block;width:100%;text-align:left;
+  transition:color 0.15s;margin-top:2px;
+}
+.ar-skills-toggle:hover{color:var(--accent);}
+.ar-skill-descs{display:none;margin-top:4px;}
+.ar-skill-descs.open{display:block;}
+.ar-skill-desc-item{
+  display:flex;gap:6px;align-items:flex-start;
+  padding:3px 0;border-top:1px solid #0f1a2e;
+}
+.ar-skill-desc-text{font-size:0.63rem;color:var(--muted);line-height:1.5;}
+
+/* between-wave reorder overlay */
+.reorder-overlay{
+  position:fixed;inset:0;z-index:9997;
+  background:rgba(0,0,0,0.8);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px 12px;
+}
+.reorder-card{
+  background:var(--panel);border:2px solid var(--gold);
+  border-radius:12px;padding:20px;width:100%;max-width:380px;
+  text-align:center;
+  animation:pasta-pop 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.reorder-title{font-family:var(--pixel);color:var(--gold);font-size:0.5rem;line-height:1.8;margin-bottom:6px;}
+.reorder-sub{font-size:0.75rem;color:var(--muted);margin-bottom:14px;}
+.reorder-slots{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.reorder-slot{
+  flex:1;max-width:110px;background:#080d18;
+  border:2px solid var(--border);border-radius:8px;
+  padding:8px 4px;text-align:center;cursor:pointer;
+  transition:border-color 0.15s;
+}
+.reorder-slot:hover{border-color:var(--gold);}
+.reorder-slot .rs-num{font-family:var(--pixel);font-size:0.28rem;color:var(--muted);line-height:1.8;}
+.reorder-slot .rs-name{font-family:var(--pixel);font-size:0.28rem;color:var(--gold);line-height:1.8;margin-top:3px;}
+.reorder-slot .rs-hp{font-family:var(--vt);font-size:0.75rem;color:var(--heal);}
+.reorder-slot.rs-dead{opacity:0.35;pointer-events:none;}
+.reorder-btns{display:flex;gap:8px;justify-content:center;}
+
+/* help modal */
+.help-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,0.75);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:20px 12px;overflow-y:auto;
+}
+.help-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:18px;width:100%;max-width:440px;
+  max-height:90vh;overflow-y:auto;
+}
+.help-title{font-family:var(--pixel);color:var(--gold);font-size:0.5rem;line-height:1.8;margin-bottom:14px;text-align:center;}
+.help-agent{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1e3358;}
+.help-agent:last-child{border:none;}
+.help-agent-name{font-family:var(--pixel);font-size:0.3rem;color:var(--gold);line-height:1.8;}
+.help-agent-role{font-size:0.6rem;color:var(--accent);margin-bottom:2px;}
+.help-agent-summary{font-size:0.68rem;color:var(--muted);line-height:1.5;}
+.help-close{
+  display:block;width:100%;margin-top:16px;
+  font-family:var(--pixel);font-size:0.38rem;
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--text);border-radius:6px;padding:10px;
+  cursor:pointer;transition:border-color 0.15s;
+}
+.help-close:hover{border-color:var(--gold);}
+
+.squad-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;flex-wrap:wrap;padding-bottom:20px;
+}
+.squad-ctr{font-family:var(--vt);color:var(--accent);font-size:1rem;}
+
+/* ═══ BATTLE ═══ */
+#battle-screen{}
+
+.mission-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;margin-bottom:10px;
+}
+.mb-title{font-family:var(--pixel);color:var(--gold);font-size:0.38rem;line-height:1.8;}
+.mb-wave{font-family:var(--vt);color:var(--accent);font-size:1rem;}
+
+/* battlefield */
+.battlefield{
+  background:linear-gradient(180deg,#0a1628 0%,#060e1a 70%,#030810 100%);
+  border:2px solid var(--border);border-radius:10px;
+  padding:14px 10px 20px;margin-bottom:10px;
+  position:relative;overflow:hidden;min-height:160px;
+}
+.battlefield::after{
+  content:'';position:absolute;
+  bottom:28px;left:0;right:0;height:2px;
+  background:repeating-linear-gradient(90deg,#1e4080 0,#1e4080 5px,transparent 5px,transparent 10px);
+}
+.bf-row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;}
+.bf-side{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+.bf-side.enemies{justify-content:flex-end;}
+
+.sprite-unit{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:default;transition:transform 0.2s;
+}
+.sprite-unit.clickable{cursor:pointer;}
+.sprite-unit.clickable:active{transform:scale(0.95);}
+.sprite-unit canvas{image-rendering:pixelated;image-rendering:crisp-edges;}
+.sprite-unit.dead{opacity:0.2;filter:grayscale(1);pointer-events:none;}
+.sprite-unit.active-glow canvas{filter:drop-shadow(0 0 5px gold);}
+.sprite-unit.targeted canvas{
+  filter:drop-shadow(0 0 7px #f87171) brightness(1.3);
+  animation:tgt-bob 0.4s ease-in-out infinite alternate;
+}
+@keyframes tgt-bob{from{transform:translateY(0);}to{transform:translateY(-4px);}}
+.sprite-unit.hit-anim{animation:s-hit 0.35s ease-out;}
+@keyframes s-hit{0%{transform:translateX(0);}30%{transform:translateX(-7px);}70%{transform:translateX(4px);}100%{transform:translateX(0);}}
+.sprite-unit.heal-anim{animation:s-heal 0.4s ease-out;}
+@keyframes s-heal{0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}
+
+.spr-name{
+  font-family:var(--pixel);font-size:0.28rem;color:var(--text);
+  text-align:center;line-height:1.6;max-width:52px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.spr-name.enemy-name{color:#fb923c;}
+.spr-hp-bar{width:44px;height:4px;background:#1e293b;border-radius:2px;overflow:hidden;}
+.spr-hp-fill{height:100%;border-radius:2px;transition:width 0.4s;}
+.hp-hi{background:#22c55e;}.hp-md{background:#eab308;}.hp-lo{background:#ef4444;}
+
+/* status panel */
+.status-panels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.status-panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:10px;
+}
+.sp-title{font-family:var(--pixel);color:var(--accent);font-size:0.32rem;line-height:1.8;margin-bottom:8px;}
+.sp-row{
+  display:flex;align-items:center;gap:6px;
+  padding:3px 0;border-bottom:1px solid #0f1a2e;
+}
+.sp-row:last-child{border:none;}
+.sp-name{font-family:var(--pixel);font-size:0.28rem;line-height:1.8;min-width:44px;color:var(--gold);}
+.sp-name.en{color:#fb923c;}
+.sp-bar{flex:1;height:5px;background:#0f1a2e;border-radius:2px;overflow:hidden;}
+.sp-fill{height:100%;border-radius:2px;transition:width 0.4s;}
+.sp-hp{font-family:var(--vt);font-size:0.75rem;color:var(--muted);white-space:nowrap;}
+.sp-badges{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px;}
+.sbadge{
+  font-size:0.55rem;padding:0 4px;border-radius:2px;
+  font-weight:600;border:1px solid;
+}
+.sb-stun{color:#a78bfa;border-color:#7c3aed;background:rgba(124,58,237,0.12);}
+.sb-dot{color:#fb923c;border-color:#ea580c;background:rgba(234,88,12,0.12);}
+.sb-mark{color:#fbbf24;border-color:#f59e0b;background:rgba(245,158,11,0.12);}
+.sb-broken{color:#60a5fa;border-color:#2563eb;background:rgba(37,99,235,0.12);}
+.sb-inj{color:#c084fc;border-color:#9333ea;background:rgba(147,51,234,0.12);}
+.sb-shield{color:#34d399;border-color:#059669;background:rgba(5,150,105,0.12);}
+.sb-script{color:#f472b6;border-color:#db2777;background:rgba(219,39,119,0.12);}
+.sb-atk{color:#38bdf8;border-color:#0284c7;background:rgba(2,132,199,0.12);}
+.sb-miss{color:#94a3b8;border-color:#475569;background:rgba(71,85,105,0.12);}
+.sb-bilateral{color:#4ade80;border-color:#16a34a;background:rgba(22,163,74,0.12);}
+.sb-deadline{color:#f0abfc;border-color:#c026d3;background:rgba(192,38,211,0.12);}
+
+/* shane directive bar */
+.directive-bar{
+  background:#080d18;border:1px solid #1e3358;
+  border-radius:8px;padding:8px 10px;margin-bottom:10px;
+}
+.db-header{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.db-title{font-family:var(--pixel);color:var(--gold);font-size:0.32rem;line-height:1.8;}
+.db-cd{font-family:var(--vt);color:var(--muted);font-size:0.85rem;}
+.db-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.dir-btn{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:5px;padding:6px 10px;color:var(--gold);
+  font-size:0.75rem;cursor:pointer;transition:all 0.15s;
+  touch-action:manipulation;
+}
+.dir-btn:hover:not(:disabled),.dir-btn:active:not(:disabled){background:#1e3358;border-color:var(--gold);}
+.dir-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* action panel */
+.action-panel{
+  background:var(--panel);border:2px solid var(--border);
+  border-radius:10px;padding:11px;margin-bottom:10px;
+}
+.ap-header{margin-bottom:9px;}
+.ap-who{font-family:var(--pixel);color:var(--gold);font-size:0.45rem;line-height:1.8;}
+.ap-role{font-size:0.7rem;color:var(--accent);}
+.ap-ap{font-family:var(--vt);color:var(--muted);font-size:0.85rem;}
+.target-prompt{
+  font-family:var(--pixel);color:var(--gold);font-size:0.35rem;
+  line-height:1.8;margin-bottom:7px;
+  animation:blink 0.8s step-end infinite;
+}
+@keyframes blink{50%{opacity:0;}}
+.skill-btns{display:flex;flex-direction:column;gap:5px;}
+.skill-btn{
+  background:#0d1526;border:1px solid #1e3358;
+  border-radius:6px;padding:9px 11px;color:var(--text);
+  font-size:0.78rem;cursor:pointer;transition:all 0.15s;
+  text-align:left;touch-action:manipulation;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.skill-btn:hover:not(:disabled),.skill-btn:active:not(:disabled){background:#1a2a44;border-color:var(--accent);}
+.skill-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.skill-btn .sk-icon{flex-shrink:0;font-size:1rem;}
+.skill-btn .sk-body{flex:1;}
+.skill-btn .sk-name{font-weight:700;font-size:0.78rem;display:block;margin-bottom:2px;}
+.skill-btn .sk-desc{font-size:0.66rem;color:var(--muted);display:block;line-height:1.5;}
+.skill-btn .sk-cost{
+  flex-shrink:0;font-family:var(--pixel);font-size:0.3rem;
+  color:var(--accent);line-height:1.8;white-space:nowrap;
+}
+.basic-atk-btn{
+  background:#080d18;border:1px solid #0f1e38;
+  border-radius:6px;padding:7px 11px;color:var(--muted);
+  font-size:0.72rem;cursor:pointer;transition:all 0.15s;
+  text-align:left;touch-action:manipulation;
+  display:flex;align-items:center;gap:8px;
+}
+.basic-atk-btn:hover:not(:disabled),.basic-atk-btn:active:not(:disabled){background:#0f1a2e;color:var(--text);}
+
+/* log */
+.battle-log{
+  background:#050810;border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;
+  height:90px;overflow-y:auto;
+  font-family:var(--vt);font-size:0.85rem;line-height:1.7;
+  margin-bottom:6px;
+}
+.log-entry{border-bottom:1px solid #0a1020;}
+.log-entry:last-child{border:none;}
+.lp{color:var(--accent);}
+.le{color:#fb923c;}
+.lh{color:var(--heal);}
+.ls{color:var(--gold);}
+.ld{color:var(--danger);font-weight:700;}
+.ldot{color:#fb923c;}
+
+/* float damage */
+.float-txt{
+  position:fixed;pointer-events:none;
+  font-family:var(--pixel);font-size:0.55rem;
+  z-index:9999;line-height:1.6;
+  animation:floatup 1.2s ease-out forwards;
+  text-shadow:1px 1px 0 #000;
+}
+@keyframes floatup{
+  0%{opacity:1;transform:translateY(0) scale(1);}
+  80%{opacity:1;transform:translateY(-50px) scale(1.1);}
+  100%{opacity:0;transform:translateY(-68px) scale(0.85);}
+}
+
+/* enrage warning */
+.enrage-warn{
+  background:rgba(220,38,38,0.15);border:1px solid #dc2626;
+  border-radius:6px;padding:5px 10px;margin-bottom:8px;
+  font-family:var(--pixel);color:#f87171;font-size:0.33rem;line-height:1.8;
+  text-align:center;animation:warn-pulse 0.8s ease-in-out infinite;
+}
+@keyframes warn-pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+
+/* pasta popup */
+.pasta-popup{
+  position:fixed;inset:0;z-index:999;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.7);
+}
+.pasta-card{
+  background:var(--panel2);border:2px solid var(--gold);
+  border-radius:14px;padding:24px 20px;text-align:center;
+  max-width:300px;width:90%;
+  animation:pasta-pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes pasta-pop{from{transform:scale(0.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pasta-emoji{font-size:3rem;margin-bottom:10px;}
+.pasta-name{font-family:var(--pixel);color:var(--gold);font-size:0.5rem;line-height:1.8;margin-bottom:6px;}
+.pasta-effect{font-size:0.82rem;color:var(--text);line-height:1.6;margin-bottom:14px;}
+
+/* result */
+#result-screen{text-align:center;padding:40px 12px;}
+.result-title{
+  font-family:var(--pixel);font-size:clamp(0.8rem,5vw,1.4rem);
+  line-height:1.6;margin-bottom:16px;
+}
+.rv{color:var(--gold);text-shadow:0 0 30px rgba(251,191,36,0.6);}
+.rl{color:var(--danger);text-shadow:0 0 30px rgba(248,113,113,0.6);}
+.result-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:18px;max-width:320px;
+  margin:0 auto 24px;
+}
+.r-row{
+  display:flex;justify-content:space-between;
+  padding:5px 0;border-bottom:1px solid #1a2236;
+  font-size:0.8rem;
+}
+.r-row:last-child{border:none;}
+.r-val{color:var(--gold);font-weight:700;}
+.result-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* AP pips */
+.ap-pips{display:flex;gap:3px;margin-top:3px;}
+.ap-pip{width:8px;height:8px;border-radius:50%;background:var(--accent);transition:background 0.2s;}
+.ap-pip.used{background:#1e3358;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ════════ TITLE ════════ -->
+<div id="title-screen" class="screen active">
+  <div class="title-main">SHANE<br>THE TAXMAN</div>
+  <div class="title-sub">⚖ TAX JUSTICE NEVER SLEEPS ⚖</div>
+
+  <div class="title-card">
+    <h3>MISSION BRIEFING</h3>
+    <p>Tax evaders have gone rogue. As <b>Shane Ong</b>, assemble a squad of 3 agents and shut them down. Each run takes about 5 minutes.</p>
+  </div>
+
+  <div class="title-card">
+    <h3>HOW TO PLAY</h3>
+    <p>
+      • Pick <b>3 agents</b> and set their turn order<br>
+      • Each agent has <b>5 AP</b> for the whole mission (4 AP on Hard)<br>
+      • Skills cost 1–2 AP. Basic attack is always free<br>
+      • Choose a skill, then click an enemy to target<br>
+      • Survive 2 waves + the boss to win<br>
+      • If a wave drags past <b>5 rounds</b> without enemies dying, they <b>ENRAGE</b> — permanent +20% ATK. Deal damage fast.
+    </p>
+  </div>
+
+  <p style="font-family:var(--pixel);color:var(--gold);font-size:0.42rem;line-height:1.8;margin-bottom:12px;">SELECT DIFFICULTY</p>
+  <div class="diff-row">
+    <div class="diff-btn active" data-diff="easy" onclick="selectDiff(this)">
+      <div class="diff-icon">😊</div>
+      <div class="diff-name">EASY</div>
+      <div class="diff-desc">Forgiving<br>Learn the game</div>
+    </div>
+    <div class="diff-btn" data-diff="standard" onclick="selectDiff(this)">
+      <div class="diff-icon">⚔️</div>
+      <div class="diff-name">STANDARD</div>
+      <div class="diff-desc">Balanced<br>Needs strategy</div>
+    </div>
+    <div class="diff-btn" data-diff="hard" onclick="selectDiff(this)">
+      <div class="diff-icon">💀</div>
+      <div class="diff-name">HARD</div>
+      <div class="diff-desc">Punishing<br>4 AP only</div>
+    </div>
+  </div>
+
+  <button class="btn btn-gold" onclick="showSquad()">ASSEMBLE TEAM ▶</button>
+</div>
+
+<!-- ════════ SQUAD ════════ -->
+<div id="squad-screen" class="screen">
+  <div class="squad-header">
+    <h2>SQUAD ASSEMBLY</h2>
+    <p>Select 3 agents. Tap slots above to reorder. <button onclick="showAgentHelp()" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--accent);font-size:0.7rem;padding:1px 7px;cursor:pointer;margin-left:4px;">ℹ️ Agent Guide</button></p>
+  </div>
+
+  <div class="order-section">
+    <h4>▶ TURN ORDER</h4>
+    <div class="order-slots" id="order-slots"></div>
+  </div>
+
+  <div class="roster-list" id="roster-list"></div>
+
+  <div class="squad-footer">
+    <div class="squad-ctr" id="squad-ctr">0 / 3 selected</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-danger" onclick="showTitle()">← BACK</button>
+      <button class="btn btn-gold" id="deploy-btn" disabled onclick="startBattle()">DEPLOY ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ BATTLE ════════ -->
+<div id="battle-screen" class="screen">
+  <div class="mission-bar">
+    <div class="mb-title" id="mb-title">OPERATION SHELL</div>
+    <div class="mb-wave" id="mb-wave">WAVE 1/3</div>
+  </div>
+
+  <div id="enrage-warn" class="enrage-warn" style="display:none">⚠ ENRAGE IN <span id="enrage-ctr">0</span> TURNS — DEAL DAMAGE FAST</div>
+
+  <div class="battlefield" id="battlefield">
+    <div class="bf-row">
+      <div class="bf-side players" id="bf-players"></div>
+      <div class="bf-side enemies" id="bf-enemies"></div>
+    </div>
+  </div>
+
+  <div class="status-panels">
+    <div class="status-panel">
+      <div class="sp-title">▶ YOUR SQUAD</div>
+      <div id="ally-panel"></div>
+    </div>
+    <div class="status-panel">
+      <div class="sp-title">▶ ENEMIES</div>
+      <div id="enemy-panel"></div>
+    </div>
+  </div>
+
+  <div class="directive-bar">
+    <div class="db-header">
+      <div class="db-title">⚡ SHANE (MANAGER)</div>
+      <div class="db-cd" id="db-cd"></div>
+    </div>
+    <div class="db-btns">
+      <button class="dir-btn" id="dir-dmg" onclick="useDirective('damage')">⚡ Damage Boost — one ally +30% dmg this turn</button>
+      <button class="dir-btn" id="dir-aud" onclick="useDirective('audit')">🔍 Full Audit — all enemies take +20% dmg for 2 turns</button>
+    </div>
+  </div>
+
+  <div class="action-panel" id="action-panel">
+    <div class="ap-header">
+      <div class="ap-who" id="ap-who">—</div>
+      <div class="ap-role" id="ap-role"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <div class="ap-ap" id="ap-ap"></div>
+        <div class="ap-pips" id="ap-pips"></div>
+      </div>
+    </div>
+    <div id="target-prompt"></div>
+    <div class="skill-btns" id="skill-btns"></div>
+  </div>
+
+  <div class="battle-log" id="battle-log">
+    <div class="log-entry ls">[ OPERATION BEGINS ]</div>
+  </div>
+</div>
+
+<!-- ════════ RESULT ════════ -->
+<div id="result-screen" class="screen">
+  <div class="result-title" id="result-title"></div>
+  <div class="result-card" id="result-card"></div>
+  <div class="result-btns">
+    <button class="btn btn-blue" onclick="showTitle()">🏠 MAIN MENU</button>
+    <button class="btn btn-gold" onclick="showSquad()">▶ PLAY AGAIN</button>
+  </div>
+</div>
+
+</div><!-- #app -->
+<script>
+// ═══════════════════════════════════════════════
+//  PIXEL SPRITE ENGINE
+// ═══════════════════════════════════════════════
+
+// Each agent has a fully custom sprite definition: {pal, tpl}
+// Pixel key: P=primary, S=secondary, K=skin, H=hair, A=accent, G=gold/highlight, W=white, x=black, _=transparent
+const AGENT_SPRITES = {
+  // Ryan Li — Investigator: broad shoulders, badge on chest, cap
+  ryan:{
+    pal:{P:'#1a4a8a',S:'#2d6abf',K:'#f4c08a',H:'#1c0f08',A:'#ff6600',G:'#fbbf24'},
+    tpl:[
+      '________________','________________',
+      '_____AAAAAA_____','____AKKKKKKA____',
+      '___AKKKKKKKA____','____AKxKKxKA____',
+      '_____AAAAAA_____','___PPPPPPPPPP___',
+      '__PPPPGGPPPPPP__','__PPPPGGPPPPPP__',
+      '__PPPPPPPAxPPP__','__PPPPPPPAxPPP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPSSSSPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Karishma — Healer: flowing hair, cross emblem on tunic, gentle silhouette
+  karishma:{
+    pal:{P:'#6b21a8',S:'#a855f7',K:'#c8845a',H:'#0d0500',A:'#fbbf24',G:'#ec4899'},
+    tpl:[
+      '________________','_____HHHHH______',
+      '____HKKKKKH_____','___HKKKKKKKH____',
+      '___HKxKKxKKH____','____HKKKKKKH____',
+      '_____HHHHH______','___PPGPPPPPPP___',
+      '__PPPGPPPPPPPP__','__PPGGGPPPPPP___',
+      '__PPPGPPPPPPP___','__PPPPPPPPPPPP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPPPPPPP____','___SSSPPPPSSS___',
+      '__SSSSPPPPSSSS__','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Sylvester — Counsel: tall wig, robes, gavel at side
+  sylvester:{
+    pal:{P:'#1f2937',S:'#374151',K:'#f0c090',H:'#f5f5f0',A:'#fbbf24',G:'#94a3b8'},
+    tpl:[
+      '____HHHHHHH_____','___HHHHHHHHH____',
+      '__HHHKKKKHHH____','__HHKKKKKKxH____',
+      '__HHKKxKKxKH____','__HHKKKKKKKH____',
+      '___HHHHHHHHH____','___PPPPPPPPPP___',
+      '__PPPPPPPPPPPP__','__PPPPPPPPAxPP__',
+      '__PPPPPPPPAxPP__','__PPPPPPAAAAxP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Richmond — Auditor: round glasses, clipboard held out front, neat parting
+  richmond:{
+    pal:{P:'#0f4c81',S:'#1d6a9e',K:'#f5d08a',H:'#1a0a00',A:'#4ade80',G:'#60a5fa'},
+    tpl:[
+      '________________','________________',
+      '_____HHHHHH_____','____HKKKKKxH____',
+      '___HKGxKKGxKH___','____HKKKKKKKH___',
+      '_____HHHHHH_____','____PPPPPPPP____',
+      '___PPPPPGGxPPP__','__PPPPPPGGxPPPP_',
+      '__PPPPPPGGxPPPP_','__PPPPPPPPxPPPP_',
+      '__PPPPPPPPPAxPP_','___PPPPPPAAAAx__',
+      '____PPAAAAAxxx__','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Shaun — GST Officer: sharp side-part, tie with GST badge, confident lean
+  shaun:{
+    pal:{P:'#7f1d1d',S:'#dc2626',K:'#fbbf8a',H:'#111827',A:'#fbbf24',G:'#f97316'},
+    tpl:[
+      '________________','________________',
+      '____HHHHHH______','___HKKKKKxH_____',
+      '___HKxKKxKKH____','___HKKKKKxKH____',
+      '____HHHHHHH_____','____PPAGPPP_____',
+      '___PPPAGPPPPx___','__PPPPAGPPPPxx__',
+      '__PPPPAGPPPPxx__','__PPPPPPPPPPxx__',
+      '__PPPPPPPPPPxx__','___PPPPPPPPxx___',
+      '____PPPPPPxx____','____SSPPPPxx____',
+      '___SSSPPPSxx____','___SSPPPPPxx____',
+      '___SSPPPPSx_____','___SSSSSSx______',
+      '____SS___SS_____','___SSS___SSS____',
+      '___PP_____PP____','________________',
+    ]
+  },
+  // Jia Wei — Dev: hoodie, headphones on neck, laptop glow on face
+  jiawei:{
+    pal:{P:'#1e293b',S:'#0ea5e9',K:'#f0d0a0',H:'#0f172a',A:'#4ade80',G:'#a78bfa'},
+    tpl:[
+      '________________','________________',
+      '____SSSSSS______','___SKKKKKKS_____',
+      '__SSKKxKKxKSS___','___SKKKKKxKS____',
+      '____SSSSSS______','___PPPPPPPPPP___',
+      '__SSPPPPPPPPSS__','__SPPPPGGPPPS___',
+      '__SPPPPGGPPPS___','__PPPPPPPPPPPP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Janus — Policymaker: tall collar, flowing coat, stern brow
+  janus:{
+    pal:{P:'#1e3a8a',S:'#3b82f6',K:'#ffe0b0',H:'#1a1a2e',A:'#c084fc',G:'#fbbf24'},
+    tpl:[
+      '________________','______HHH_______',
+      '____HHKKKxHH____','___HHKKKKKxKH___',
+      '___HKKxKKxKKH___','____HKKKKKxKH___',
+      '_____HHHHHH_____','__PPPPPPPPPPPP__',
+      '_PPPPSSPPPPSSPP_','_PPPPSSPPPPSSPP_',
+      '_PPPPPPPPPAPxPP_','_PPPPPPPPPAPPP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Bethany — AI Lead: ponytail, tablet in hand, teal jacket
+  bethany:{
+    pal:{P:'#134e4a',S:'#14b8a6',K:'#fcd5a0',H:'#0f172a',A:'#34d399',G:'#a78bfa'},
+    tpl:[
+      '______HHHH______','_____HKKKKKH____',
+      '____HKKKKxKH____','___HKKxKKxKKH___',
+      '___HKKKKKKxKH___','__HHHHHHHHHHH___',
+      '_________HHHHHH_','___PPPPPPPPP____',
+      '__PPPPPPPPPPGxx_','__PPPPPPPPPPGxx_',
+      '__PPPPPPPPPPGxx_','__PPPPPPPPPGxx__',
+      '__PPPPPPPPPP____','___PPPPPPPPPP___',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Arif — Outreach: megaphone prop, casual jacket, wide stance
+  arif:{
+    pal:{P:'#7c2d12',S:'#ea580c',K:'#d4956a',H:'#1c0a00',A:'#fbbf24',G:'#f97316'},
+    tpl:[
+      '________________','________________',
+      '____HHHHHH______','___HKKKKKxH_____',
+      '__HHKxKKxKKH____','___HKKKKKxH_____',
+      '____HHHHHH______','_AAAPPPPPPP_____',
+      'AAAAPPPPPPPPP___','AAAxPPPPPPPPP___',
+      'AAxPPPPPPPPPP___','__PPPPPPPPPPPP__',
+      '__PPPPPPPPPPPP__','___PPPPPPPPPP___',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Angel — Procurement: bob hair, clipboard, warm pink blazer
+  angel:{
+    pal:{P:'#831843',S:'#ec4899',K:'#f5c5a0',H:'#080808',A:'#fde68a',G:'#f0abfc'},
+    tpl:[
+      '________________','________________',
+      '___HHHHHHHH_____','__HHKKKKKxHH____',
+      '__HHKxKKxKKH____','__HHKKKKKxKH____',
+      '___HHHHHHHH_____','___PPPPPPPPPP___',
+      '__PPPGPPPPPGPxx_','__PPPGPPPPPGPxx_',
+      '__PPPGGGGGGGxx__','__PPPPPPPPPPxx__',
+      '__PPPPPPPPPPxx__','___PPPPPPPPP____',
+      '____PPPPPPPP____','____SSPPPPSS____',
+      '___SSSPPPPSSS___','___SSPPPPPPSS___',
+      '___SSPPPPPSS____','___SSSSSSSS_____',
+      '____SS____SS____','___SSS____SSS___',
+      '___PP______PP___','________________',
+    ]
+  },
+  // Jasper — Seconded Officer: formal posture, MOF lanyard, slim build
+  jasper:{
+    pal:{P:'#1e3a5f',S:'#2d6a9f',K:'#e8c89a',H:'#12080a',A:'#60a5fa',G:'#fbbf24'},
+    tpl:[
+      '________________','________________',
+      '_____HHHHHH_____','____HKKKKxKH____',
+      '___HHKxKKxKKH___','____HKKKKxKH____',
+      '_____HHHHHH_____','____PPPPPPPP____',
+      '___PPPPGAPPPPx__','__PPPPPGAPPPPxx_',
+      '__PPPPPGAPPPPxx_','__PPPPPPPPPPxx__',
+      '__PPPPPPPPPPxx__','___PPPPPPPPx____',
+      '____PPPPPPx_____','____SSPPPPx_____',
+      '___SSSSPPSx_____','___SSPPPPPP_____',
+      '___SSPPPPS______','___SSSSSSS______',
+      '____SS___SS_____','___SSS___SSS____',
+      '___PP_____PP____','________________',
+    ]
+  },
+};
+
+function drawAgent(canvas,id,scale=2){
+  const spr=AGENT_SPRITES[id];if(!spr)return;
+  const {pal,tpl}=spr;
+  const W=16,H=tpl.length;
+  canvas.width=W*scale;canvas.height=H*scale;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cm={P:pal.P,S:pal.S,K:pal.K,H:pal.H,A:pal.A,G:pal.G,W:'#fff',x:'#000',_:null};
+  tpl.forEach((row,y)=>{for(let x=0;x<row.length&&x<W;x++){const c=cm[row[x]];if(!c)continue;ctx.fillStyle=c;ctx.fillRect(x*scale,y*scale,scale,scale);}});
+}
+
+function drawShane(canvas,scale=2){
+  // Shane: gold blazer, dark tie, strong jaw, commanding presence
+  const tpl=[
+    '________________','____GGGGGGGG____',
+    '___GGKKKKKKGG___','__GGKKKKKKKKG___',
+    '__GGKKxKKxKKG___','___GKKKKKKxKG___',
+    '____GGGGGGGG____','___GPPPGGGPPP___',
+    '__GGPPPGGGPPGG__','_GGGPPPGGGPPPGG_',
+    '_GPPPPPxPPPPPPG_','_GPPPPPxPPPPPPG_',
+    '_GPPPPPPPPPPPG__','__GPPPPPPPPPPG__',
+    '___GPPPPPPPG____','____SSGPPGSS____',
+    '___SSSPPPPSS____','___SSPPPPPPSS___',
+    '___SSPPPPPSS____','___SSSSSSSSS____',
+    '___SS_____SS____','__SSS_____SSS___',
+    '__GG_______GG___','________________',
+  ];
+  const W=16,H=tpl.length;
+  canvas.width=W*scale;canvas.height=H*scale;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cm={G:'#fbbf24',K:'#f0c080',P:'#1a3a6a',S:'#0f2040',x:'#000',_:null};
+  tpl.forEach((row,y)=>{for(let x=0;x<row.length&&x<W;x++){const c=cm[row[x]];if(!c)continue;ctx.fillStyle=c;ctx.fillRect(x*scale,y*scale,scale,scale);}});
+}
+
+function drawEnemy(canvas,type,variant,scale=2){
+  // Three fully distinct enemy silhouettes
+  const designs=[
+    // Variant 0: Stocky Corporate Grunt — wide boxy build, frown, gold tie clip
+    {
+      pal:{P:'#2d3748',S:'#4a5568',K:'#f0d090',H:'#1a1a1a',T:'#fbbf24'},
+      tpl:[
+        '________________','________________',
+        '___HHHHHHHHH____','__HHKKKKKKKHH___',
+        '__HHKKxKKxKKH___','__HHKKKxKKKKH___',
+        '___HHHHHHHHH____','___PPPPTPPPPx___',
+        '__PPPPPTPPPPxx__','_PPPPPPTPPPPxxx_',
+        '_PPxPPPTPPPPxxx_','_PPPxPPPPPPPxx__',
+        '_PPPPPPPPPPPxx__','__PPPPPPPPPPx___',
+        '___PPPPPPPPx____','___SSSSPPSSx____',
+        '__SSSSPPPSSx____','__SSPPPPPPSS____',
+        '__SSPPPPPSS_____','__SSSSSSSS______',
+        '___SS____SS_____','__SSS____SSS____',
+        '__PP______PP____','________________',
+      ]
+    },
+    // Variant 1: Tall Slim Auditor — narrow silhouette, round glasses, briefcase
+    {
+      pal:{P:'#1e3a5f',S:'#2d6a9f',K:'#ffe0b0',H:'#0a0a0a',T:'#e2e8f0'},
+      tpl:[
+        '________________','________________',
+        '_____HHHHHHH____','____HKKKKKxKH___',
+        '___HHTKxKTKHH___','____HKKKKKxH____',
+        '_____HHHHHH_____','_____PPTPPPx____',
+        '____PPPTPPPPx___','___PPPPTPPPPxx__',
+        '__PPPPPTPPPPxx__','___PPPPPPPPPx___',
+        '___PPPPPPPPxx___','____PPPPPPPx____',
+        '_____PPPPPx_____','_____SSSPSx_____',
+        '____SSSPSSx_____','____SSPPPPPP____',
+        '____SSPPPPS_____','____SSSSSSS_____',
+        '_____SS__SS_____','____SSS__SSS____',
+        '____PP____PP____','________________',
+      ]
+    },
+    // Variant 2: Hunched Evader — heavy coat raised collar, nervous glance left
+    {
+      pal:{P:'#374151',S:'#6b7280',K:'#fcd5a0',H:'#ff8c00',T:'#f87171'},
+      tpl:[
+        '________________','________________',
+        '__SSSSSSSSSSS___','_SSKKKKKKxSSSSS_',
+        '_SSKKxKKxKKSS___','_SSKKKKKKxSSS___',
+        '__SSSSSSSSSSS___','__SSPPPPPPSSx___',
+        '_SSSPPPPPPSSxx__','_SSTxPPPPSSSxx__',
+        '_SSTxPPPPPSSxx__','_SSSSPPPPPSSx___',
+        '__SSPPPPPPSSx___','___SSPPPPSSx____',
+        '____SSPPSSx_____','____SSSSSx______',
+        '___SSSSSx_______','___SSPPPPSS_____',
+        '___SSPPPSS______','___SSSSSSS______',
+        '____SS__SS______','___SSS__SSS_____',
+        '___PP____PP_____','________________',
+      ]
+    },
+  ];
+  const d=designs[variant%3];
+  const W=16,H=d.tpl.length;
+  canvas.width=W*scale;canvas.height=H*scale;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cm={P:d.pal.P,S:d.pal.S,K:d.pal.K,H:d.pal.H,T:d.pal.T,x:'#000',_:null};
+  d.tpl.forEach((row,y)=>{for(let cx=0;cx<row.length&&cx<W;cx++){const c=cm[row[cx]];if(!c)continue;ctx.fillStyle=c;ctx.fillRect(cx*scale,y*scale,scale,scale);}});
+}
+
+// ═══════════════════════════════════════════════
+//  GAME DATA
+// ═══════════════════════════════════════════════
+
+const AGENTS = [
+  {
+    id:'ryan',name:'Ryan Li',role:'Investigator',
+    tags:['attack','support'],
+    hp:85,maxHp:85,
+    skills:[
+      {name:'Battering Ram',icon:'🔓',desc:'Deal 30–38 damage to one enemy.',type:'damage',dmg:[30,38],target:'single',ap:1},
+      {name:'Tax Recovery',icon:'💸',desc:'Deal 20 damage to one enemy; heal yourself for 10 HP.',type:'drain',dmg:[20,20],heal:10,target:'single',ap:1},
+      {name:'Surveillance',icon:'🕵️',desc:'One enemy takes +15% more damage from all sources for 2 turns.',type:'debuff',effect:'mark',dur:2,target:'single',ap:1},
+    ]
+  },
+  {
+    id:'karishma',name:'Karishma Jayakumar',role:'Customer Service Officer',
+    tags:['heal'],
+    hp:70,maxHp:70,
+    skills:[
+      {name:"Hi! I'm Karishma, How Can I Help You?",icon:'😊',desc:'Heal ALL allies for 18 HP.',type:'heal',amt:[18,18],target:'all_allies',ap:2},
+      {name:'Tax Relief',icon:'💊',desc:'Heal one ally for 28–35 HP. You choose who.',type:'heal',amt:[28,35],target:'ally_choose',ap:1},
+      {name:'Extension of Deadline',icon:'📅',desc:'Choose one ally — if they would be knocked out this mission, they survive on 1 HP instead. One use per ally.',type:'deadline',target:'ally_choose',ap:1},
+    ]
+  },
+  {
+    id:'sylvester',name:'Sylvester Sim',role:'Counsel',
+    tags:['control'],
+    hp:80,maxHp:80,
+    skills:[
+      {name:'Contempt of Court',icon:'⚖️',desc:'Enemy skips their next turn. Any hit on a stunned enemy deals +30% damage. (40% chance on boss only.)',type:'stun',target:'single',ap:1},
+      {name:'Hammer of Justice',icon:'🔨',desc:'Nothing this turn — enemy takes 45–55 damage at the START of your next turn.',type:'hammer',dmg:[45,55],target:'single',ap:1},
+      {name:'Injunction',icon:'📁',desc:'Enemy can only basic attack for 2 turns — no special abilities.',type:'injunction',target:'single',ap:1},
+    ]
+  },
+  {
+    id:'richmond',name:'Richmond Yeo',role:'Auditor',
+    tags:['support','buff'],
+    hp:75,maxHp:75,
+    skills:[
+      {name:'Audit Report',icon:'📊',desc:'Two findings, one filing: apply Mark (+15% dmg taken) AND ATK -30% to one enemy simultaneously for 3 turns.',type:'audit_report',dur:3,target:'single',ap:1},
+      {name:'Section 95',icon:'⚖️',desc:'Deal 10 damage per active debuff on the target (minimum 10). More debuffs = more damage.',type:'section95',target:'single',ap:1},
+      {name:'Cross-Reference',icon:'🔗',desc:'Spread the +15% damage effect from one enemy to ALL living enemies. Requires one enemy to already have it.',type:'crossref',target:'none',ap:1},
+    ]
+  },
+  {
+    id:'shaun',name:'Shaun Chin',role:'Tax Specialist',
+    tags:['debuff','support'],
+    hp:72,maxHp:72,
+    skills:[
+      {name:'GST Levy',icon:'🧾',desc:'Enemy loses 9% of their MAX HP every turn for 5 turns. Hits harder on tanky enemies.',type:'dot',dotRate:0.09,dotDur:5,target:'single',ap:1},
+      {name:'Double Taxation Relief',icon:'🛡️',desc:'Shaun takes 30% less damage for 2 turns. File a claim, reduce the liability.',type:'tax_relief',dur:2,target:'none',ap:1},
+      {name:'Tax on Tax',icon:'💱',desc:'Deal 20 damage. If that enemy was already hit by someone else this turn, deal 20 bonus damage on top.',type:'double_tax',dmg:[20,20],bonus:20,target:'single',ap:1},
+    ]
+  },
+  {
+    id:'jiawei',name:'Jia Wei Tan',role:'Software Developer',
+    tags:['support','attack'],
+    hp:78,maxHp:78,
+    skills:[
+      {name:'Caffeine Override',icon:'☕',desc:'Gain +2 AP immediately, but lose 15 HP. Can be used multiple times — the more you push it, the harder Deploy hits.',type:'caffeine',target:'none',ap:0},
+      {name:'Hotfix',icon:'🔧',desc:'Remove one bad effect from an ally, OR strip one good effect from an enemy.',type:'hotfix',target:'choice',ap:1},
+      {name:'Deploy to Production',icon:'💥',desc:'Deal 35 base damage + 1 per HP Jia Wei is missing. The more burned out he is, the harder this hits.',type:'nuke_scaling',target:'single',ap:2},
+    ]
+  },
+  {
+    id:'janus',name:'Janus Chen',role:'Policymaker',
+    tags:['attack','debuff'],
+    hp:65,maxHp:65,
+    skills:[
+      {name:'White Paper',icon:'📜',desc:'Deal 30–40 magic damage to one enemy.',type:'damage',dmg:[30,40],target:'single',ap:1},
+      {name:'Public Consultation',icon:'🔮',desc:'Charge this turn — next turn deal 52–62 damage to ALL enemies.',type:'charge',dmg:[52,62],target:'none',ap:2},
+      {name:'Regulatory Framework',icon:'📋',desc:'All enemies deal 20% less damage for 2 turns.',type:'atkdown',dur:2,target:'none',ap:1},
+    ]
+  },
+  {
+    id:'bethany',name:'Bethany Su',role:'AI Lead',
+    tags:['summon','heal'],
+    hp:68,maxHp:68,
+    skills:[
+      {name:'Deploy Inspector Bot',icon:'🤖',desc:'A bot attacks one enemy for 12–16 damage every turn for 3 turns.',type:'bot_single',dmg:[12,16],botDur:3,target:'single',ap:1},
+      {name:'Hack',icon:'💻',desc:'Scan all enemies — each one gets a random debuff (broken, miss, or mark) applied instantly.',type:'hack',target:'none',ap:1},
+      {name:'RecipeBot',icon:'🍝',desc:"Bethany's AI serves up 3 pasta dishes — you pick one. Each does something different.",type:'pasta',target:'none',ap:1},
+    ]
+  },
+  {
+    id:'arif',name:'Arif Khan',role:'Outreach Officer',
+    tags:['debuff','buff'],
+    hp:74,maxHp:74,
+    skills:[
+      {name:'Public Awareness Campaign',icon:'📣',desc:'Choose one: all enemies deal 30% less damage for 2 turns, OR all enemies have 30% miss chance for 2 turns.',type:'awareness_choice',dur:2,target:'none',ap:2},
+      {name:'Outreach Drive',icon:'📢',desc:'All allies deal 20% more damage for 2 turns.',type:'outreach',dur:2,target:'none',ap:1},
+      {name:'Targeted Messaging',icon:'🎯',desc:'One enemy deals 30% less damage for 3 turns.',type:'broken',dur:3,target:'single',ap:1},
+    ]
+  },
+  {
+    id:'angel',name:'Angel Jasmine Loh',role:'Procurement Officer',
+    tags:['heal','support'],
+    hp:68,maxHp:68,
+    skills:[
+      {name:'Dinner & Dance',icon:'🥂',desc:'Heal one ally 20–28 HP and remove one bad effect from them. You choose who.',type:'budget_approval',amt:[20,28],target:'ally_choose',ap:1},
+      {name:'Budget Reallocation',icon:'♻️',desc:'Choose two allies — their combined AP is pooled and split evenly between them. Costs Angel 1 AP.',type:'reallocation',target:'ally_choose_two',ap:1},
+      {name:'Procurement Request',icon:'🔎',desc:'Choose an ally — grant them +1 AP.',type:'proc_request',target:'ally_choose',ap:1},
+    ]
+  },
+  {
+    id:'jasper',name:'Jasper Saran',role:'Seconded Officer',
+    tags:['support','control'],
+    hp:70,maxHp:70,
+    skills:[
+      {name:'Policy Veto',icon:'🏛️',desc:"The next ability this enemy uses this wave is completely nullified — no damage, no effect. Cannot be used on bosses.",type:'policy_veto',target:'single',ap:1},
+      {name:'Inter-Agency Coordination',icon:'🤝',desc:'Choose an ally — they immediately use one skill for free. Once per wave.',type:'coordination',target:'ally_choose',ap:2},
+      {name:'Fiscal Review',icon:'📉',desc:'One enemy takes +15% more damage for 3 turns. Can be stacked with other mark effects — each stack extends the duration.',type:'debuff',effect:'mark',dur:3,stack:true,target:'single',ap:1},
+    ]
+  },
+];
+
+const PASTA_DISHES = [
+  {name:'Spaghetti Carbonara',icon:'🍝',effect:'Heal all allies for 15 HP.',fn:(state)=>{
+    state.party.filter(p=>p.hp>0).forEach(p=>{const h=Math.min(p.maxHp-p.hp,15);p.hp+=h;state.gameStats.heal+=h;});
+    addLog('🍝 Carbonara — heals all allies 15 HP!','lh');
+  }},
+  {name:'Mafaldine al Ragù',icon:'🍜',effect:'Clear ALL bad effects from one ally.',fn:(state)=>{
+    const t=state.party.filter(p=>p.hp>0).reduce((a,b)=>a.hp<b.hp?a:b);
+    ['stun','dot','broken','atk_down','miss'].forEach(k=>delete t.statuses[k]);
+    addLog(`🍜 Mafaldine al Ragù — all debuffs cleared from ${t.name}!`,'lh');
+  }},
+  {name:'Pesto Trofie',icon:'🥗',effect:'All allies deal +10% more damage for 2 turns.',fn:(state)=>{
+    state.globalBuffs.outreach=Math.max(state.globalBuffs.outreach||0,2);
+    addLog('🥗 Pesto Trofie — all allies +10% damage for 2 turns!','lh');
+  }},
+  {name:"Rigatoni all'Arrabbiata",icon:'🌶️',effect:'Heal all allies 10 HP AND deal 8 damage to all enemies.',fn:(state)=>{
+    state.party.filter(p=>p.hp>0).forEach(p=>{const h=Math.min(p.maxHp-p.hp,10);p.hp+=h;state.gameStats.heal+=h;});
+    state.enemies.filter(e=>e.hp>0).forEach(e=>{e.hp=Math.max(0,e.hp-8);state.gameStats.dmg+=8;});
+    addLog("🌶️ Rigatoni all'Arrabbiata — heal 10 all + 8 dmg all enemies!",'lh');
+  }},
+  {name:'Cacio e Pepe',icon:'🫕',effect:'Heal one ally for 25 HP.',fn:(state)=>{
+    const t=state.party.filter(p=>p.hp>0).reduce((a,b)=>a.hp<b.hp?a:b);
+    const h=Math.min(t.maxHp-t.hp,25);t.hp+=h;state.gameStats.heal+=h;
+    addLog(`🫕 Cacio e Pepe — heals ${t.name} for ${h} HP!`,'lh');
+  }},
+];
+
+// Enemy pools
+const ENEMY_POOL = {
+  easy:[
+    {name:'Front Clerk',hp:60,maxHp:60,atk:9,v:0,abilities:[{name:'Basic Attack',fn:'basic'}]},
+    {name:'Paper Pusher',hp:68,maxHp:68,atk:10,v:1,abilities:[{name:'Basic Attack',fn:'basic'},{name:'File Recovery',fn:'self_heal',amt:8,every:2}]},
+    {name:'Compliance Officer',hp:72,maxHp:72,atk:8,v:2,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Rubber Stamp',fn:'buff_ally_atk',amt:0.2,dur:2}]},
+  ],
+  standard:[
+    {name:'Shell Manager',hp:105,maxHp:105,atk:14,v:0,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Transfer Funds',fn:'self_heal_once',amt:20,threshold:0.5}]},
+    {name:'Auditor (Enemy)',hp:92,maxHp:92,atk:12,v:1,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Counter Audit',fn:'counter',dmg:8}]},
+    {name:'Offshore Account',hp:88,maxHp:88,atk:11,v:2,special:'first_hit_immune',abilities:[{name:'Basic Attack',fn:'basic'},{name:'Shell Protection',fn:'basic'}]},
+  ],
+  hard:[
+    {name:'Senior Manager',hp:125,maxHp:125,atk:18,v:0,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Performance Review',fn:'mark_target',bonusDmg:15}]},
+    {name:'Legal Counsel',hp:112,maxHp:112,atk:15,v:1,special:'debuff_resist',abilities:[{name:'Basic Attack',fn:'basic'},{name:'Objection',fn:'basic'}]},
+    {name:'Tax Evader',hp:118,maxHp:118,atk:16,v:2,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Offshore Transfer',fn:'transfer_hp',amt:20,every:3}]},
+  ],
+};
+
+const BOSSES = {
+  easy:{
+    name:'The CFO',hp:120,maxHp:120,atk:16,v:0,boss:true,
+    phases:[
+      {threshold:1.0,ability:{name:'Board Meeting',fn:'aoe_weak',dmg:10}},
+      {threshold:0.5,ability:{name:'Bonus Extraction',fn:'double_hit'}},
+    ]
+  },
+  standard:{
+    name:'The CFO',hp:160,maxHp:160,atk:20,v:0,boss:true,
+    phases:[
+      {threshold:1.0,ability:{name:'Offshore Transfer',fn:'self_heal_once',amt:20,threshold:0.66}},
+      {threshold:0.66,ability:{name:'Bonus Extraction',fn:'double_hit'}},
+      {threshold:0.33,ability:{name:'Golden Parachute',fn:'remove_debuffs_heal'}},
+    ]
+  },
+  hard:{
+    name:'The CFO (Hostile Takeover)',hp:210,maxHp:210,atk:26,v:0,boss:true,
+    phases:[
+      {threshold:1.0,ability:{name:'Offshore Transfer',fn:'self_heal_once',amt:25,threshold:0.66}},
+      {threshold:0.66,ability:{name:'Bonus Extraction',fn:'double_hit'}},
+      {threshold:0.33,ability:{name:'Golden Parachute',fn:'remove_debuffs_heal'}},
+      {threshold:0.2,ability:{name:'Hostile Takeover',fn:'triple_hit'}},
+    ]
+  },
+};
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+
+let G = {
+  diff:'easy',
+  selectedIds:[],
+  party:[],
+  enemies:[],
+  bots:[],
+  wave:0,
+  turn:0,   // index in turnQueue
+  turnQueue:[],
+  roundNum:0,
+  shaneCD:0,
+  directiveActive:null,
+  charging:null,   // {agentIdx, skill}
+  hammer:null,     // {agentIdx, enemyIdx, dmg}
+  waitTarget:null, // {skill, agentIdx}
+  hotfixMode:null, // 'ally'|'enemy'
+  coordMode:null,  // agentIdx to grant bonus AP
+  hitsThisTurn:{}, // enemyId->count for double_tax
+  globalBuffs:{outreach:0,bilateral:0,directiveDmg:0,directiveAudit:0},
+  enrageCounter:0,
+  enraged:false,
+  gameStats:{dmg:0,heal:0,rounds:0},
+  deadLogged:{},
+  maxAP:5,
+  coordGranted:null,
+  coordUsedThisWave:false,
+  _renderingAgentIdx:0,
+};
+
+// ═══════════════════════════════════════════════
+//  SCREEN NAV
+// ═══════════════════════════════════════════════
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+const showTitle=()=>showScreen('title-screen');
+function showSquad(){
+  G.selectedIds=[];
+  renderRoster();renderOrderSlots();
+  showScreen('squad-screen');
+}
+function selectDiff(el){
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  G.diff=el.dataset.diff;
+}
+
+// ═══════════════════════════════════════════════
+//  SQUAD SELECT
+// ═══════════════════════════════════════════════
+
+const AGENT_SUMMARY = {
+  ryan:     'Self-sustaining attacker. Marks enemies for +15% damage and heals himself on hit.',
+  karishma: 'Pure healer. Best single-target heals in the game. Extension of Deadline can save a teammate from death.',
+  sylvester:'Controller. Stun an enemy to skip their turn and boost damage against them. Hammer hits hard next round.',
+  richmond: 'Debuff stacker. Audit Report applies two debuffs at once. Cross-Reference spreads them to all enemies.',
+  shaun:    'DoT specialist. GST Levy shreds tanky enemies over time. Tax Relief gives him personal damage reduction.',
+  jiawei:   'Risk engine. Burn HP with Caffeine Override to power up Deploy to Production — the lower his HP, the harder it hits.',
+  janus:    'Glass cannon. Regulatory Framework cuts incoming damage while he charges a wave-clearing AoE nuke.',
+  bethany:  'Flexible disruptor. Hack applies a random debuff to each enemy instantly. RecipeBot gives situational utility each turn.',
+  arif:     'Debuff controller. Choose between cutting enemy damage or forcing misses. Outreach Drive boosts the whole team.',
+  angel:    'AP manager. Dinner & Dance heals and cleanses a chosen ally. Reallocation lets you pick two allies and evenly splits their combined AP. Procurement Request gives +1AP to whoever needs it most.',
+  jasper:   'Coordinator. Policy Veto nullifies an enemy\'s next ability before it fires. Coordination grants an ally a free skill once per wave.',
+};
+
+function renderRoster(){
+  const list=document.getElementById('roster-list');
+  list.innerHTML='';
+  AGENTS.forEach(a=>{
+    const sel=G.selectedIds.includes(a.id);
+    const row=document.createElement('div');
+    row.className='agent-row'+(sel?' selected':'');
+
+    // Sprite
+    const spr=document.createElement('div');
+    spr.className='ar-sprite';
+    const c=document.createElement('canvas');
+    drawAgent(c,a.id,2);
+    spr.appendChild(c);
+
+    const tagHtml=a.tags.map(t=>`<span class="role-tag tag-${t}">${t}</span>`).join('');
+
+    // Skills list — names + cost always visible, descriptions behind one toggle
+    const skillNamesHtml=a.skills.map(sk=>`
+      <div class="ar-skill-item">
+        <span class="ar-skill-icon">${sk.icon}</span>
+        <span class="ar-skill-name">${sk.name}</span>
+        <span class="ar-skill-cost">${sk.ap===0?'free':`${sk.ap}AP`}</span>
+      </div>`).join('');
+
+    const skillDescsHtml=a.skills.map(sk=>`
+      <div class="ar-skill-desc-item">
+        <span class="ar-skill-icon">${sk.icon}</span>
+        <span class="ar-skill-desc-text">${sk.desc}</span>
+      </div>`).join('');
+
+    const infoDiv=document.createElement('div');
+    infoDiv.className='ar-info';
+    infoDiv.innerHTML=`
+      <div class="ar-name-row">
+        <span class="ar-name">${a.name}</span>
+        <span class="ar-hp-num">❤ ${a.maxHp}</span>
+      </div>
+      <div class="ar-role">${a.role}</div>
+      <div class="ar-tags">${tagHtml}</div>
+      <div class="ar-skills-block">
+        <div class="ar-skill-names">${skillNamesHtml}</div>
+        <button class="ar-skills-toggle" data-id="${a.id}">▶ descriptions</button>
+        <div class="ar-skill-descs" id="descs-${a.id}">${skillDescsHtml}</div>
+      </div>
+    `;
+
+    row.appendChild(spr);
+    row.appendChild(infoDiv);
+    row.insertAdjacentHTML('beforeend',`<div class="ar-check">✓</div>`);
+
+    row.onclick=(e)=>{
+      if(e.target.closest('.ar-skills-toggle')) return;
+      toggleAgent(a.id);
+    };
+
+    list.appendChild(row);
+
+    const toggleBtn=row.querySelector('.ar-skills-toggle');
+    const descsDiv=row.querySelector(`#descs-${a.id}`);
+    toggleBtn.onclick=(e)=>{
+      e.stopPropagation();
+      const open=descsDiv.classList.toggle('open');
+      toggleBtn.textContent=open?'▼ descriptions':'▶ descriptions';
+    };
+  });
+  updateSquadCtr();
+}
+
+function toggleAgent(id){
+  if(G.selectedIds.includes(id)){G.selectedIds=G.selectedIds.filter(x=>x!==id);}
+  else{
+    if(G.selectedIds.length>=3){floatTxt('MAX 3',window.innerWidth/2,180,'#f87171');return;}
+    G.selectedIds.push(id);
+  }
+  renderRoster();renderOrderSlots();
+}
+
+function renderOrderSlots(){
+  const wrap=document.getElementById('order-slots');
+  wrap.innerHTML='';
+  for(let i=0;i<3;i++){
+    const slot=document.createElement('div');
+    slot.className='order-slot'+(G.selectedIds[i]?' filled':'');
+    const lbl=document.createElement('div');
+    lbl.className='sl-num';lbl.textContent='SLOT '+(i+1);
+    slot.appendChild(lbl);
+    if(G.selectedIds[i]){
+      const a=AGENTS.find(x=>x.id===G.selectedIds[i]);
+      const c=document.createElement('canvas');
+      drawAgent(c,a.id,2);
+      slot.appendChild(c);
+      const nm=document.createElement('div');
+      nm.className='sl-name';nm.textContent=a.name.split(' ')[0];
+      slot.appendChild(nm);
+      const rb=document.createElement('button');
+      rb.className='sl-remove';rb.textContent='✕';
+      rb.onclick=(e)=>{e.stopPropagation();G.selectedIds.splice(i,1);renderRoster();renderOrderSlots();};
+      slot.appendChild(rb);
+      // tap to move up
+      slot.onclick=()=>{if(i>0){[G.selectedIds[i-1],G.selectedIds[i]]=[G.selectedIds[i],G.selectedIds[i-1]];renderRoster();renderOrderSlots();}};
+      slot.title='Tap to move left';
+    } else {
+      const em=document.createElement('div');em.className='sl-empty';em.textContent='—';
+      slot.appendChild(em);
+    }
+    wrap.appendChild(slot);
+  }
+  updateSquadCtr();
+}
+
+function updateSquadCtr(){
+  document.getElementById('squad-ctr').textContent=`${G.selectedIds.length} / 3 selected`;
+  document.getElementById('deploy-btn').disabled=G.selectedIds.length!==3;
+}
+
+function showAgentHelp(){
+  const overlay=document.createElement('div');
+  overlay.className='help-overlay';
+  const agentRowsHtml=AGENTS.map(a=>{
+    const c=document.createElement('canvas');
+    drawAgent(c,a.id,2);
+    // We'll use a placeholder and fill after appending
+    return `<div class="help-agent">
+      <canvas id="hc-${a.id}" width="32" height="48" style="image-rendering:pixelated;flex-shrink:0;"></canvas>
+      <div>
+        <div class="help-agent-name">${a.name}</div>
+        <div class="help-agent-role">${a.role}</div>
+        <div class="help-agent-summary">${AGENT_SUMMARY[a.id]||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  overlay.innerHTML=`
+    <div class="help-card">
+      <div class="help-title">AGENT GUIDE</div>
+      ${agentRowsHtml}
+      <button class="help-close" onclick="this.closest('.help-overlay').remove()">✕ CLOSE</button>
+    </div>`;
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+  document.body.appendChild(overlay);
+  // Draw sprites into canvases after appending
+  AGENTS.forEach(a=>{
+    const canvas=overlay.querySelector(`#hc-${a.id}`);
+    if(canvas) drawAgent(canvas,a.id,2);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  BATTLE INIT
+// ═══════════════════════════════════════════════
+
+function dc(o){return JSON.parse(JSON.stringify(o));}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+function startBattle(){
+  G.maxAP=G.diff==='hard'?4:5;
+  G.party=G.selectedIds.map(id=>{
+    const a=dc(AGENTS.find(x=>x.id===id));
+    a.statuses={};a.ap=G.maxAP;a.deadlineUsed={};a._dl=false;
+    return a;
+  });
+  G.bots=[];G.wave=0;G.shaneCD=0;G.directiveActive=null;
+  G.charging=null;G.hammer=null;G.waitTarget=null;G.hotfixMode=null;G.coordMode=null;
+  G.globalBuffs={outreach:0,bilateral:0,directiveDmg:0,directiveAudit:0};
+  G.gameStats={dmg:0,heal:0,rounds:0};G.deadLogged={};
+  G.hitsThisTurn={};
+  showScreen('battle-screen');
+  loadWave();
+}
+
+function pickEnemies(wave){
+  const pool=dc(ENEMY_POOL[G.diff]);
+  if(wave===2){
+    // boss wave
+    const boss=dc(BOSSES[G.diff]);
+    boss.statuses={};boss.id='boss';boss._healedOnce=false;boss._phaseIdx=0;
+    return[boss];
+  }
+  // random 1-2 enemies from pool
+  const shuffled=pool.sort(()=>Math.random()-0.5);
+  const count=rand(1,2);
+  return shuffled.slice(0,count).map((e,i)=>{
+    e.statuses={};e.id='e'+i;e._healedOnce=false;e._turnsAlive=0;e._dl=false;
+    return e;
+  });
+}
+
+function showReorderPrompt(){
+  const overlay=document.createElement('div');
+  overlay.className='reorder-overlay';
+
+  function renderSlots(){
+    const slotsDiv=overlay.querySelector('.reorder-slots');
+    slotsDiv.innerHTML='';
+    G.party.forEach((p,i)=>{
+      const slot=document.createElement('div');
+      slot.className='reorder-slot'+(p.hp<=0?' rs-dead':'');
+      const c=document.createElement('canvas');
+      drawAgent(c,p.id,2);
+      slot.appendChild(c);
+      slot.insertAdjacentHTML('beforeend',`
+        <div class="rs-num">SLOT ${i+1}</div>
+        <div class="rs-name">${p.name.split(' ')[0]}</div>
+        <div class="rs-hp">${p.hp<=0?'KO':'❤'+p.hp}</div>
+      `);
+      // tap to swap with previous slot (cycle left)
+      slot.onclick=()=>{
+        if(i>0){
+          [G.party[i-1],G.party[i]]=[G.party[i],G.party[i-1]];
+          renderSlots();
+        }
+      };
+      slotsDiv.appendChild(slot);
+    });
+  }
+
+  overlay.innerHTML=`
+    <div class="reorder-card">
+      <div class="reorder-title">⚔ WAVE ${G.wave+1} INCOMING</div>
+      <div class="reorder-sub">Tap a slot to move it left. Reorder your team before the next wave.</div>
+      <div class="reorder-slots"></div>
+      <div class="reorder-btns">
+        <button class="btn btn-gold" onclick="document.querySelector('.reorder-overlay').remove();loadWave();">DEPLOY ▶</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  renderSlots();
+}
+
+function loadWave(){
+  G.enemies=pickEnemies(G.wave);
+  G.bots=[];G.enrageCounter=0;G.enraged=false;
+  G.hitsThisTurn={};G.coordUsedThisWave=false;
+  document.getElementById('mb-title').textContent=
+    G.wave===2?`BOSS: ${G.enemies[0].name}`:`OPERATION SHELL`;
+  document.getElementById('mb-wave').textContent=`WAVE ${G.wave+1}/3`;
+  document.getElementById('enrage-warn').style.display='none';
+  clearLog();
+  addLog(`[ WAVE ${G.wave+1}: ${G.enemies.map(e=>e.name).join(', ')} — ENRAGE IN 5 ROUNDS ]`,'ls');
+  buildQueue();renderAll();nextTurn();
+}
+
+function buildQueue(){
+  G.turnQueue=[];
+  G.party.forEach((_,i)=>G.turnQueue.push({type:'player',idx:i}));
+  G.enemies.forEach((_,i)=>G.turnQueue.push({type:'enemy',idx:i}));
+  G.turn=0;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+
+function hpClass(pct){return pct>0.6?'hp-hi':pct>0.3?'hp-md':'hp-lo';}
+function renderAll(){renderBF();renderStatPanels();renderDirectives();renderEnrage();}
+
+function renderBF(){
+  const pp=document.getElementById('bf-players');
+  const ep=document.getElementById('bf-enemies');
+  pp.innerHTML='';ep.innerHTML='';
+
+  // Shane
+  const su=makeUnit('shane',null,false);
+  const sc=su.querySelector('canvas');
+  drawShane(sc,3);
+  su.querySelector('.spr-name').textContent='SHANE';
+  su.querySelector('.spr-name').style.color='#fbbf24';
+  pp.appendChild(su);
+
+  // Party
+  G.party.forEach((p,i)=>{
+    const u=makeUnit(p.id,'player-'+i,p.hp<=0,true);
+    pp.appendChild(u);
+  });
+
+  // Bots
+  G.bots.forEach((b,i)=>{
+    const u=document.createElement('div');
+    u.className='sprite-unit';u.id='bot-'+i;
+    const c=document.createElement('canvas');
+    c.width=24;c.height=36;
+    const ctx=c.getContext('2d');
+    ctx.fillStyle='#14b8a6';
+    ctx.fillRect(4,0,16,12);ctx.fillRect(2,12,20,18);
+    ctx.fillRect(0,30,10,6);ctx.fillRect(14,30,10,6);
+    u.appendChild(c);
+    const nm=document.createElement('div');nm.className='spr-name';
+    nm.style.color='#34d399';
+    nm.textContent=b.type==='single'?'BOT-I':'BOT-C';
+    u.appendChild(nm);
+    const ht=document.createElement('div');ht.className='spr-name';
+    ht.style.color='#64748b';ht.textContent=b.turnsLeft+'t';
+    u.appendChild(ht);
+    pp.appendChild(u);
+  });
+
+  // Enemies
+  G.enemies.forEach((e,i)=>{
+    const u=makeUnit('enemy-'+i,null,e.hp<=0,false,true,i);
+    const c=u.querySelector('canvas');
+    drawEnemy(c,e.boss?'corp':'corp',e.v||0,3);
+    if(e.boss){c.style.filter='drop-shadow(0 0 4px gold)';}
+    ep.appendChild(u);
+  });
+}
+
+function makeUnit(agentId,domId,dead,isPlayer,isEnemy,enemyIdx){
+  const u=document.createElement('div');
+  u.className='sprite-unit'+(dead?' dead':'');
+  if(domId)u.id=domId;
+  if(isEnemy&&!dead&&G.waitTarget){
+    u.classList.add('targeted','clickable');
+    u.onclick=()=>selectTarget(enemyIdx);
+  }
+  const c=document.createElement('canvas');
+  const playerAgent=isPlayer?G.party.find(p=>p.id===agentId):null;
+  if(isPlayer){if(playerAgent)drawAgent(c,playerAgent.id,3);}
+  else if(!isEnemy)drawAgent(c,agentId,3);
+  u.appendChild(c);
+
+  const nm=document.createElement('div');
+  nm.className='spr-name'+(isEnemy?' enemy-name':'');
+  if(isPlayer){
+    nm.textContent=playerAgent?playerAgent.name.split(' ')[0]:'?';
+  } else if(isEnemy){
+    nm.textContent=G.enemies[enemyIdx]?G.enemies[enemyIdx].name.split(' ')[0]:'?';
+  }
+  u.appendChild(nm);
+
+  if(isPlayer||isEnemy){
+    const src=isPlayer?playerAgent:G.enemies[enemyIdx];
+    if(src){
+      const pct=Math.max(0,src.hp/src.maxHp);
+      const bar=document.createElement('div');bar.className='spr-hp-bar';
+      const fill=document.createElement('div');
+      fill.className='spr-hp-fill '+hpClass(pct);
+      fill.style.width=(pct*100)+'%';
+      bar.appendChild(fill);u.appendChild(bar);
+    }
+  }
+  return u;
+}
+
+function renderStatPanels(){
+  const ap=document.getElementById('ally-panel');
+  const ep=document.getElementById('enemy-panel');
+  ap.innerHTML='';ep.innerHTML='';
+
+  G.party.forEach(p=>{
+    const pct=Math.max(0,p.hp/p.maxHp);
+    const row=document.createElement('div');row.className='sp-row';
+    const badges=buildBadges(p.statuses);
+    row.innerHTML=`
+      <div>
+        <div class="sp-name">${p.name.split(' ')[0]}</div>
+        ${badges?`<div class="sp-badges">${badges}</div>`:''}
+      </div>
+      <div class="sp-bar"><div class="sp-fill ${hpClass(pct)}" style="width:${pct*100}%"></div></div>
+      <div class="sp-hp">${Math.max(0,p.hp)}/${p.maxHp}</div>
+    `;
+    ap.appendChild(row);
+  });
+
+  G.enemies.filter(e=>e.hp>0).forEach(e=>{
+    const pct=Math.max(0,e.hp/e.maxHp);
+    const row=document.createElement('div');row.className='sp-row';
+    const badges=buildBadges(e.statuses);
+    row.innerHTML=`
+      <div>
+        <div class="sp-name en">${e.name.split(' ')[0]}</div>
+        ${badges?`<div class="sp-badges">${badges}</div>`:''}
+      </div>
+      <div class="sp-bar"><div class="sp-fill ${hpClass(pct)}" style="width:${pct*100}%"></div></div>
+      <div class="sp-hp">${Math.max(0,e.hp)}/${e.maxHp}</div>
+    `;
+    ep.appendChild(row);
+  });
+}
+
+function buildBadges(s){
+  let b='';
+  if(s.stun)     b+=`<span class="sbadge sb-stun">STUN</span>`;
+  if(s.dot)      b+=`<span class="sbadge sb-dot">GST(${s.dot}t)</span>`;
+  if(s.mark)     b+=`<span class="sbadge sb-mark">MARK(${s.mark}t)</span>`;
+  if(s.broken)   b+=`<span class="sbadge sb-broken">ATK↓(${s.broken}t)</span>`;
+  if(s.inj)      b+=`<span class="sbadge sb-inj">INJ(${s.inj}t)</span>`;
+  if(s.shield)   b+=`<span class="sbadge sb-shield">SHIELD</span>`;
+  if(s.script)   b+=`<span class="sbadge sb-script">SCRIPT(${s.script}t)</span>`;
+  if(s.atk_down) b+=`<span class="sbadge sb-atk">ATK↓</span>`;
+  if(s.miss)     b+=`<span class="sbadge sb-miss">MISS30%</span>`;
+  if(s.bilateral)b+=`<span class="sbadge sb-bilateral">+5/HIT</span>`;
+  if(s.deadline) b+=`<span class="sbadge sb-deadline">DEADLINE</span>`;
+  if(s.tax_relief)b+=`<span class="sbadge sb-shield">RELIEF(${s.tax_relief}t)</span>`;
+  if(s.policy_veto)b+=`<span class="sbadge sb-inj">VETOED</span>`;
+  return b;
+}
+
+function renderDirectives(){
+  document.getElementById('dir-dmg').disabled=G.shaneCD>0;
+  document.getElementById('dir-aud').disabled=G.shaneCD>0;
+  document.getElementById('db-cd').textContent=G.shaneCD>0?`CD: ${G.shaneCD}t`:'Ready';
+}
+
+function renderEnrage(){
+  const ENRAGE_LIMIT=5;
+  const warn=document.getElementById('enrage-warn');
+  if(G.enrageCounter>=ENRAGE_LIMIT-2&&!G.enraged){
+    warn.style.display='block';
+    document.getElementById('enrage-ctr').textContent=ENRAGE_LIMIT-G.enrageCounter;
+  } else warn.style.display='none';
+}
+
+function renderActionPanel(agent,forcedAgentIdx){
+  // forcedAgentIdx is used during Coordination when we render outside normal turn flow
+  const agentIdx = forcedAgentIdx!==undefined ? forcedAgentIdx : G.turnQueue[G.turn]?.idx;
+  G._renderingAgentIdx = agentIdx; // store so handleSkill can use it
+  document.getElementById('ap-who').textContent=`${agent.emoji||'👤'} ${agent.name}`;
+  document.getElementById('ap-role').textContent=agent.role;
+  document.getElementById('ap-ap').textContent=`AP: ${agent.ap} remaining`;
+  const pips=document.getElementById('ap-pips');
+  pips.innerHTML=Array.from({length:G.maxAP},(_,i)=>`<div class="ap-pip${i>=agent.ap?' used':''}"></div>`).join('');
+  document.getElementById('target-prompt').innerHTML='';
+  G.waitTarget=null;
+
+  const sb=document.getElementById('skill-btns');
+  if(!sb) return;
+  sb.innerHTML='';
+
+  agent.skills.forEach((sk,si)=>{
+    const btn=document.createElement('button');
+    btn.className='skill-btn';
+    let disabled=sk.ap>0&&agent.ap<sk.ap;
+    if(sk.type==='crossref'&&!G.enemies.some(e=>e.hp>0&&e.statuses.mark)) disabled=true;
+    btn.disabled=disabled;
+    btn.innerHTML=`
+      <span class="sk-icon">${sk.icon}</span>
+      <span class="sk-body">
+        <span class="sk-name">${sk.name}</span>
+        <span class="sk-desc">${sk.desc}</span>
+      </span>
+      <span class="sk-cost">${sk.ap===0?'free':`${sk.ap}AP`}</span>
+    `;
+    btn.onclick=()=>handleSkill(G._renderingAgentIdx, si);
+    sb.appendChild(btn);
+  });
+
+  // basic attack
+  const ba=document.createElement('button');
+  ba.className='basic-atk-btn';
+  ba.innerHTML='<span style="font-size:1rem">👊</span><span><b>Basic Attack</b> — deal 10 damage to one enemy (free)</span>';
+  ba.onclick=()=>{G.waitTarget={skill:{type:'basic_atk'},agentIdx:G._renderingAgentIdx};showTargetPrompt();};
+  sb.appendChild(ba);
+}
+
+function showTargetPrompt(){
+  document.getElementById('target-prompt').innerHTML='<div class="target-prompt">▶ TAP AN ENEMY TO TARGET</div>';
+  renderBF();
+}
+
+function showAllyTargetPrompt(){
+  const {skill,agentIdx}=G.waitTarget;
+  const selfExclude=skill&&(skill.type==='proc_request'||skill.type==='coordination');
+  const alive=G.party.filter((p,i)=>p.hp>0&&!(selfExclude&&i===agentIdx));
+  if(!alive.length){
+    G.waitTarget=null;
+    document.getElementById('target-prompt').innerHTML='';
+    addLog('No valid ally target available','ls');
+    return;
+  }
+  const btns=alive.map(p=>{
+    const i=G.party.indexOf(p);
+    return `<button class="dir-btn" onclick="selectAllyTarget(${i})" style="flex:1;">
+      ${p.name.split(' ')[0]}<br>
+      <span style="font-size:0.7rem;color:var(--heal);">❤ ${p.hp}/${p.maxHp}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('target-prompt').innerHTML=`
+    <div class="target-prompt" style="margin-bottom:6px;">▶ CHOOSE AN ALLY</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${btns}</div>`;
+}
+
+function showAllyTargetPromptTwo(label){
+  const alive=G.party.filter(p=>p.hp>0);
+  const first=G.waitTarget?.firstPick;
+  const btns=alive.map(p=>{
+    const i=G.party.indexOf(p);
+    const isFirst=first===i;
+    return `<button class="dir-btn" onclick="selectAllyTarget(${i})" style="flex:1;${isFirst?'border-color:var(--gold);':''}"
+      ${first!==null&&first===i?'disabled':''}>
+      ${p.name.split(' ')[0]}<br>
+      <span style="font-size:0.7rem;color:var(--accent);">${p.ap}AP</span>
+    </button>`;
+  }).join('');
+  document.getElementById('target-prompt').innerHTML=`
+    <div class="target-prompt" style="margin-bottom:6px;">${label||'▶ CHOOSE FIRST ALLY'}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${btns}</div>`;
+}
+
+function selectAllyTarget(partyIdx){
+  if(!G.waitTarget)return;
+  const{skill,agentIdx,pickTwo,firstPick}=G.waitTarget;
+
+  if(pickTwo){
+    if(firstPick===null){
+      // First pick done — ask for second
+      G.waitTarget.firstPick=partyIdx;
+      showAllyTargetPromptTwo('▶ CHOOSE SECOND ALLY');
+      return;
+    } else {
+      // Second pick — execute with both indices
+      G.waitTarget=null;
+      document.getElementById('target-prompt').innerHTML='';
+      execSkill(agentIdx,skill,[firstPick,partyIdx],'ally_choose_two');
+      return;
+    }
+  }
+
+  G.waitTarget=null;
+  document.getElementById('target-prompt').innerHTML='';
+  execSkill(agentIdx,skill,partyIdx,'ally_choose');
+}
+
+// ═══════════════════════════════════════════════
+//  TURN ENGINE
+// ═══════════════════════════════════════════════
+
+function nextTurn(){
+  // Guard: if result screen is showing, don't proceed
+  if(document.getElementById('result-screen').classList.contains('active'))return;
+  // check ends
+  if(checkEnd())return;
+
+  // advance past dead
+  while(G.turn<G.turnQueue.length){
+    const t=G.turnQueue[G.turn];
+    if(t.type==='player'){if(G.party[t.idx].hp<=0){G.turn++;continue;}break;}
+    else{if(!G.enemies[t.idx]||G.enemies[t.idx].hp<=0){G.turn++;continue;}break;}
+  }
+
+  if(G.turn>=G.turnQueue.length){
+    endRound();return;
+  }
+
+  const t=G.turnQueue[G.turn];
+  if(t.type==='player') doPlayerTurn(t.idx);
+  else doEnemyTurn(t.idx);
+}
+
+function endRound(){
+  // Guard: bail if game already over
+  if(document.getElementById('result-screen').classList.contains('active'))return;
+  G.roundNum++;G.gameStats.rounds++;
+  G.enrageCounter++;
+
+  // tick global buffs
+  if(G.globalBuffs.outreach>0) G.globalBuffs.outreach--;
+  if(G.globalBuffs.bilateral>0) G.globalBuffs.bilateral--;
+  if(G.globalBuffs.directiveAudit>0) G.globalBuffs.directiveAudit--;
+  if(G.shaneCD>0) G.shaneCD--;
+
+  // tick status effects
+  G.enemies.forEach(e=>{
+    if(e.hp<=0)return;
+    tickStatuses(e,false);
+  });
+  G.party.forEach(p=>tickStatuses(p,true));
+
+  // tick bots
+  tickBots();
+
+  // hammer resolution
+  if(G.hammer){
+    const {enemyIdx,dmg}=G.hammer;
+    G.hammer=null;
+    const e=G.enemies[enemyIdx];
+    if(e&&e.hp>0){
+      const bonus=e.statuses.stun?Math.floor(dmg*0.3):0;
+      const total=dmg+bonus;
+      applyDmgToEnemy(enemyIdx,total);
+      addLog(`🔨 Hammer of Justice lands! ${e.name} -${total} dmg${bonus?` (stun bonus +${bonus})`:''}!`,'lp');
+    }
+  }
+
+  // reset per-round tracking
+  G.hitsThisTurn={};
+  G.coordGranted=null;
+
+  // enrage
+  const ENRAGE_LIMIT=5;
+  if(G.enrageCounter>=ENRAGE_LIMIT&&!G.enraged){
+    G.enraged=true;
+    G.enemies.forEach(e=>{if(e.hp>0)e.atk=Math.round(e.atk*1.2);});
+    addLog('⚠ ENRAGE! All enemies ATK +20% permanently!','ld');
+    floatTxt('ENRAGE!',window.innerWidth/2-30,150,'#f87171');
+  }
+
+  buildQueue();
+  renderAll();
+  setTimeout(nextTurn,300);
+}
+
+function tickStatuses(c,isAlly){
+  const s=c.statuses;
+  // countdown durations
+  ['mark','broken','inj','atk_down','miss','bilateral','tax_relief'].forEach(k=>{
+    if(s[k]>0){s[k]--;if(s[k]<=0)delete s[k];}
+  });
+  if(s.stun){delete s.stun;}// stun lasts 1 turn
+
+  // DoT tick — 9% of MAX HP (flat, consistent, punishes tanky enemies)
+  if(s.dot>0){
+    const dmg=Math.max(1,Math.round(c.maxHp*0.09));
+    c.hp=Math.max(0,c.hp-dmg);
+    G.gameStats.dmg+=dmg;
+    s.dot--;
+    if(s.dot<=0)delete s.dot;
+    addLog(`🧾 GST Levy: ${c.name} -${dmg} HP`,'ldot');
+    if(!isAlly) floatTxt(`-${dmg}`,getEnemyX(G.enemies.indexOf(c)),'#fb923c');
+  }
+
+  // script countdown -> detonate
+  if(s.script!==undefined){
+    s.script--;
+    if(s.script<=0){
+      delete s.script;
+      if(!isAlly){
+        const dmg=30;c.hp=Math.max(0,c.hp-dmg);G.gameStats.dmg+=dmg;
+        addLog(`💥 Script detonates on ${c.name} for ${dmg} dmg!`,'lp');
+        floatTxt(`-${dmg}`,getEnemyX(G.enemies.indexOf(c)),'#f472b6');
+      }
+    }
+  }
+}
+
+function tickBots(){
+  G.bots=G.bots.filter(b=>{
+    b.turnsLeft--;
+    if(b.turnsLeft<=0){addLog(`🤖 Bot dissipates`,'ls');return false;}
+    if(b.type==='single'){
+      const t=G.enemies.find(e=>e.hp>0);
+      if(t){const d=rand(12,16);applyDmgToEnemy(G.enemies.indexOf(t),d);addLog(`🤖 Inspector Bot: ${d} dmg to ${t.name}`,'lp');}
+    } else {
+      const d=5;
+      G.enemies.filter(e=>e.hp>0).forEach(e=>{applyDmgToEnemy(G.enemies.indexOf(e),d);});
+      addLog(`🛡️ Compliance Bot: 5 dmg all enemies`,'lp');
+    }
+    return true;
+  });
+}
+
+function checkEnd(){
+  if(G.party.every(p=>p.hp<=0)){setTimeout(()=>showResult(false),500);return true;}
+  if(G.enemies.every(e=>e.hp<=0)){
+    G.wave++;
+    if(G.wave>=3){setTimeout(()=>showResult(true),600);}
+    else{addLog(`[ WAVE CLEARED! ]`,'ls');setTimeout(showReorderPrompt,1200);}
+    return true;
+  }
+  // log deaths
+  [...G.enemies,...G.party].forEach(c=>{
+    if(c.hp<=0&&!G.deadLogged[c.id||c.name]){
+      G.deadLogged[c.id||c.name]=true;
+      addLog(`✝ ${c.name} is down!`,'ld');
+    }
+  });
+  return false;
+}
+
+// ═══════════════════════════════════════════════
+//  PLAYER TURN
+// ═══════════════════════════════════════════════
+
+function doPlayerTurn(idx){
+  // resolve charge
+  if(G.charging&&G.charging.agentIdx===idx){resolveCharge(idx);return;}
+
+  const agent=G.party[idx];
+  if(agent.statuses.stun){
+    addLog(`⚡ ${agent.name} is STUNNED — skips turn`,'ls');
+    G.turn++;setTimeout(nextTurn,600);return;
+  }
+
+  // glow
+  document.querySelectorAll('.sprite-unit').forEach(u=>u.classList.remove('active-glow'));
+  const su=document.getElementById('player-'+idx);
+  if(su)su.classList.add('active-glow');
+
+  renderActionPanel(agent, idx);
+  G.waitTarget=null;
+}
+
+function handleSkill(agentIdx,skillIdx){
+  const agent=G.party[agentIdx];
+  if(!agent||agent.hp<=0) return;
+  const skill=agent.skills[skillIdx];
+
+  if(skill.ap>0&&agent.ap<skill.ap){floatTxt('NOT ENOUGH AP',window.innerWidth/2-40,180,'#f87171');return;}
+
+  if(skill.target==='single'||skill.target==='ally'||skill.target==='ally_choose'||skill.target==='ally_choose_two'){
+    if(skill.target==='single'){
+      G.waitTarget={skill,agentIdx};showTargetPrompt();
+    } else if(skill.target==='ally_choose'){
+      G.waitTarget={skill,agentIdx};showAllyTargetPrompt();
+    } else if(skill.target==='ally_choose_two'){
+      G.waitTarget={skill,agentIdx,pickTwo:true,firstPick:null};showAllyTargetPromptTwo();
+    } else {
+      // ally target: pick lowest hp
+      execSkill(agentIdx,skill,null,'ally');
+    }
+  } else if(skill.target==='choice'){
+    // hotfix: show choice
+    G.waitTarget={skill,agentIdx};
+    document.getElementById('target-prompt').innerHTML=`
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button class="dir-btn" onclick="hotfixChoice('ally')">🔧 Fix an ally (remove bad effect)</button>
+        <button class="dir-btn" onclick="hotfixChoice('enemy')">🔧 Fix an enemy (remove good effect)</button>
+      </div>`;
+  } else if(skill.target==='ally_ap'){
+    // proc_request: auto-targets ally with lowest AP
+    execSkill(agentIdx,skill,null,'ally_ap');
+  } else {
+    execSkill(agentIdx,skill,null,skill.target);
+  }
+}
+
+function hotfixChoice(side){
+  const {skill,agentIdx}=G.waitTarget;
+  if(side==='ally'){
+    const debuffed=G.party.filter(p=>p.hp>0&&['stun','dot','broken','atk_down','miss'].some(k=>p.statuses[k]));
+    if(!debuffed.length){
+      G.waitTarget=null;document.getElementById('target-prompt').innerHTML='';
+      addLog('No ally has a bad effect to remove','ls');
+      renderActionPanel(G.party[agentIdx],agentIdx);
+      return;
+    }
+    const btns=debuffed.map(p=>{
+      const i=G.party.indexOf(p);
+      const k=['stun','dot','broken','atk_down','miss'].find(k=>p.statuses[k]);
+      return `<button class="dir-btn" onclick="hotfixAllyPicked(${i})" style="flex:1;">
+        ${p.name.split(' ')[0]}<br>
+        <span style="font-size:0.65rem;color:var(--danger);">${k}</span>
+      </button>`;
+    }).join('');
+    document.getElementById('target-prompt').innerHTML=`
+      <div class="target-prompt" style="margin-bottom:6px;">▶ CHOOSE ALLY TO CLEANSE</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${btns}</div>`;
+  } else {
+    G.waitTarget={...G.waitTarget,hotfixEnemy:true};
+    document.getElementById('target-prompt').innerHTML='<div class="target-prompt">▶ TAP ENEMY TO REMOVE THEIR BUFF</div>';
+    renderBF();
+  }
+}
+
+function hotfixAllyPicked(partyIdx){
+  if(!G.waitTarget)return;
+  const{skill,agentIdx}=G.waitTarget;
+  G.waitTarget=null;document.getElementById('target-prompt').innerHTML='';
+  const t=G.party[partyIdx];
+  const k=['stun','dot','broken','atk_down','miss'].find(k=>t.statuses[k]);
+  if(k){delete t.statuses[k];addLog(`🔧 Hotfix: removed ${k} from ${t.name}`,'lp');}
+  spendAP(agentIdx,skill.ap);advanceTurn();
+}
+
+function selectTarget(enemyIdx){
+  if(!G.waitTarget)return;
+  const{skill,agentIdx,hotfixEnemy}=G.waitTarget;
+  G.waitTarget=null;
+  document.getElementById('target-prompt').innerHTML='';
+
+  if(hotfixEnemy){
+    const e=G.enemies[enemyIdx];
+    const good=['mark','atk_buff'];
+    const k=good.find(k=>e.statuses[k]);
+    if(k){delete e.statuses[k];addLog(`🔧 Hotfix: removed ${k} from ${e.name}`,'lp');}
+    else addLog(`${e.name} has no buff to remove`,'ls');
+    spendAP(agentIdx,skill.ap);advanceTurn();
+    return;
+  }
+
+  execSkill(agentIdx,skill,enemyIdx,'single');
+}
+
+function execSkill(agentIdx,skill,targetIdx,targetType){
+  const agent=G.party[agentIdx];
+  const target=targetType==='single'?G.enemies[targetIdx]:targetType==='ally_choose'?G.party[targetIdx]:null;
+
+  // Helper to re-enable buttons if we bail early
+  function reEnableButtons(){
+    const sb=document.getElementById('skill-btns');
+    if(sb) sb.querySelectorAll('button').forEach(b=>b.disabled=false);
+    renderActionPanel(agent,agentIdx);
+  }
+
+  // Disable buttons to prevent double-fire (will be re-rendered by advanceTurn/nextTurn normally)
+  const sb0=document.getElementById('skill-btns');
+  if(sb0) sb0.querySelectorAll('button').forEach(b=>b.disabled=true);
+
+  let dmgMult=1;
+  if(G.directiveActive==='damage'){dmgMult*=1.3;G.directiveActive=null;}
+  if(G.globalBuffs.directiveDmg>0) dmgMult*=1.2;
+  if(G.globalBuffs.outreach>0) dmgMult*=1.2;
+  if(G.globalBuffs.directiveAudit>0&&target) dmgMult*=1.2;
+
+  switch(skill.type){
+    case'basic_atk':{
+      const d=Math.round(10*dmgMult);
+      applyDmgToEnemy(targetIdx,d);
+      addLog(`${agent.name} → Basic Attack → ${G.enemies[targetIdx].name} (-${d})`,'lp');
+      trackHit(targetIdx);
+      spendAP(agentIdx,0);advanceTurn();return;
+    }
+    case'damage':{
+      let d=Math.round(rand(...skill.dmg)*dmgMult);
+      if(target&&target.statuses.mark) d=Math.round(d*1.15);
+      if(target&&target.statuses.stun) d=Math.round(d*1.3);
+      applyDmgToEnemy(targetIdx,d);
+      addLog(`${agent.name} → ${skill.name} → ${target.name} (-${d})`,'lp');
+      trackHit(targetIdx);break;
+    }
+    case'drain':{
+      const d=rand(...skill.dmg);
+      applyDmgToEnemy(targetIdx,d);
+      const h=Math.min(agent.maxHp-agent.hp,skill.heal);
+      agent.hp+=h;G.gameStats.heal+=h;
+      addLog(`${agent.name} → Tax Recovery → ${target.name} (-${d}) / self +${h} HP`,'lp');
+      floatTxt(`+${h}`,getPlayerX(agentIdx),'#4ade80');
+      trackHit(targetIdx);break;
+    }
+    case'heal':{
+      if(targetType==='all_allies'){
+        const amt=rand(...skill.amt);
+        G.party.filter(p=>p.hp>0).forEach((p,i)=>{const h=Math.min(p.maxHp-p.hp,amt);p.hp+=h;G.gameStats.heal+=h;floatTxt(`+${h}`,getPlayerX(i),'#4ade80');});
+        addLog(`${agent.name} → ${skill.name} → heals all ~${amt} HP`,'lh');
+      } else {
+        // ally_choose: targetIdx is party index; fallback to weakest if not provided
+        const chosen = targetType==='ally_choose' ? G.party[targetIdx] : G.party.filter(p=>p.hp>0).reduce((a,b)=>a.hp<b.hp?a:b);
+        const wi=G.party.indexOf(chosen);
+        const amt=rand(...skill.amt);
+        const h=Math.min(chosen.maxHp-chosen.hp,amt);
+        chosen.hp+=h;G.gameStats.heal+=h;
+        addLog(`${agent.name} → ${skill.name} → ${chosen.name} +${h} HP`,'lh');
+        floatTxt(`+${h}`,getPlayerX(wi),'#4ade80');
+        animUnit('player-'+wi,'heal-anim');
+      }
+      break;
+    }
+    case'deadline':{
+      const chosen = targetType==='ally_choose' ? G.party[targetIdx] : G.party.filter(p=>p.hp>0).reduce((a,b)=>a.hp/a.maxHp<b.hp/b.maxHp?a:b);
+      if(!agent.deadlineUsed[chosen.name]){
+        chosen.statuses.deadline=true;agent.deadlineUsed[chosen.name]=true;
+        addLog(`📅 Extension of Deadline → ${chosen.name} will survive next KO on 1 HP!`,'lh');
+      } else addLog(`Already used Deadline on ${chosen.name} this mission`,'ls');
+      break;
+    }
+    case'stun':{
+      const isBoss=target&&target.boss;
+      if(isBoss&&Math.random()>0.4){addLog(`${skill.name} failed on boss!`,'ls');reEnableButtons();return;}
+      target.statuses.stun=1;addLog(`${agent.name} → Contempt of Court → ${target.name} STUNNED`,'lp');floatTxt('STUNNED!',getEnemyX(targetIdx),'#a78bfa');
+      break;
+    }
+    case'hammer':{
+      const d=rand(...skill.dmg);
+      G.hammer={enemyIdx:targetIdx,dmg:d};
+      addLog(`${agent.name} → Hammer of Justice → ${target.name} will take ${d} damage next round!`,'lp');
+      break;
+    }
+    case'injunction':{
+      target.statuses.inj=2;
+      addLog(`${agent.name} → Injunction → ${target.name} can only basic attack for 2 turns`,'lp');
+      break;
+    }
+    case'tax_relief':{
+      agent.statuses.tax_relief=skill.dur;
+      addLog(`🛡️ ${agent.name} → Double Taxation Relief — takes 30% less damage for ${skill.dur} turns!`,'lp');
+      floatTxt('RELIEF!',getPlayerX(agentIdx),'#34d399');
+      break;
+    }
+    case'section95':{
+      const debuffKeys=['mark','broken','inj','dot','script','atk_down','miss','mof_rej'];
+      const count=debuffKeys.filter(k=>target.statuses[k]).length;
+      const dmg=Math.max(10,count*10);
+      applyDmgToEnemy(targetIdx,dmg);
+      addLog(`⚖️ ${agent.name} → Section 95 → ${target.name}: ${count} debuff(s) × 10 = ${dmg} dmg!`,'lp');
+      trackHit(targetIdx);
+      break;
+    }
+    case'audit_report':{
+      // Two findings: mark (+15% dmg) AND atk_down (-15% atk) simultaneously
+      target.statuses.mark=skill.dur;
+      target.statuses.broken=Math.max(target.statuses.broken||0,skill.dur);
+      addLog(`📊 ${agent.name} → Audit Report → ${target.name}: MARKED (+15% dmg taken) + ATK ↓30% for ${skill.dur} turns`,'lp');
+      floatTxt('AUDITED',getEnemyX(targetIdx),'#60a5fa');
+      break;
+    }
+    case'debuff':{
+      if(skill.effect==='mark'){
+        // debuff_resist: 50% chance to shrug it off
+        if(target.special==='debuff_resist'&&Math.random()<0.5){
+          addLog(`${target.name} → Objection! Debuff resisted!`,'le');
+          floatTxt('RESISTED',getEnemyX(targetIdx),'#94a3b8');
+          break;
+        }
+        const existing=target.statuses.mark||0;
+        target.statuses.mark=skill.stack?Math.max(existing+1,skill.dur):skill.dur;
+        addLog(`${agent.name} → ${skill.name} → ${target.name} takes +15% more damage${skill.stack&&existing?' (stacked!)':''}`,'lp');
+      }
+      break;
+    }
+    case'crossref':{
+      const marked=G.enemies.filter(e=>e.hp>0&&e.statuses.mark);
+      if(!marked.length){addLog('No enemy is Marked to cross-reference','ls');break;}
+      const dur=marked[0].statuses.mark;
+      G.enemies.filter(e=>e.hp>0).forEach(e=>{e.statuses.mark=dur;});
+      addLog(`📊 Cross-Reference → ALL enemies now take +15% more damage!`,'lp');
+      break;
+    }
+    case'dot':{
+      if(target.special==='debuff_resist'&&Math.random()<0.5){
+        addLog(`${target.name} → Objection! GST resisted!`,'le');
+        floatTxt('RESISTED',getEnemyX(targetIdx),'#94a3b8');
+        break;
+      }
+      target.statuses.dot=skill.dotDur;
+      addLog(`🧾 GST Levy → ${target.name} loses 9% MAX HP/turn for ${skill.dotDur} turns`,'lp');
+      break;
+    }
+    case'bilateral':{
+      G.globalBuffs.bilateral=skill.dur;
+      G.enemies.filter(e=>e.hp>0).forEach(e=>e.statuses.bilateral=skill.dur);
+      addLog(`🌐 Bilateral Agreement → enemies take +5 dmg on every ally hit for ${skill.dur} turns`,'lp');
+      break;
+    }
+    case'double_tax':{
+      let d=20;
+      const hits=G.hitsThisTurn[target.id]||0;
+      if(hits>0){d+=skill.bonus;addLog(`${agent.name} → Double Taxation Treaty → ${target.name} (-${d}) (+${skill.bonus} bonus!)`,'lp');}
+      else addLog(`${agent.name} → Double Taxation Treaty → ${target.name} (-${d})`,'lp');
+      applyDmgToEnemy(targetIdx,d);
+      trackHit(targetIdx);break;
+    }
+    case'script':{
+      target.statuses.script=3;
+      addLog(`⚙️ Automate → Script planted on ${target.name} — detonates in 3 turns for 30 dmg!`,'lp');
+      break;
+    }
+    case'caffeine':{
+      // 0AP cost — gain +2AP, lose 15 HP. Handled specially since ap:0
+      if(agent.hp<=15){addLog(`☕ ${agent.name} → Can't push further — too low HP!`,'ls');reEnableButtons();return;}
+      agent.ap=Math.min(G.maxAP,agent.ap+2);
+      agent.hp=Math.max(1,agent.hp-15);
+      addLog(`☕ ${agent.name} → Caffeine Override! +2 AP, -15 HP (now ${agent.hp} HP)`,'lp');
+      floatTxt('+2 AP',getPlayerX(agentIdx),'#a78bfa');
+      floatTxt('-15',getPlayerX(agentIdx),'#f87171');
+      animUnit('player-'+agentIdx,'hit-anim');
+      renderAll();
+      // don't advance turn — player keeps acting
+      return;
+    }
+    case'nuke_scaling':{
+      const missing=agent.maxHp-agent.hp;
+      let d=Math.round((35+missing)*dmgMult);
+      if(target&&target.statuses.mark) d=Math.round(d*1.15);
+      if(target&&target.statuses.stun) d=Math.round(d*1.3);
+      applyDmgToEnemy(targetIdx,d);
+      addLog(`💥 ${agent.name} → Deploy to Production → ${target.name} (-${d}) [base 35 + ${missing} missing HP]`,'lp');
+      trackHit(targetIdx);
+      break;
+    }
+    case'nuke':{
+      if(Math.random()<0.15){
+        agent.hp=Math.max(1,agent.hp-skill.selfDmg);
+        addLog(`💥 Deploy to Production — BACKFIRE! ${agent.name} -${skill.selfDmg} HP`,'ld');
+        floatTxt('BACKFIRE!',getPlayerX(agentIdx),'#f87171');
+        animUnit('player-'+agentIdx,'hit-anim');
+      } else {
+        let d=Math.round(rand(...skill.dmg)*dmgMult);
+        if(target&&target.statuses.mark) d=Math.round(d*1.15);
+        applyDmgToEnemy(targetIdx,d);
+        addLog(`💥 Deploy to Production → ${target.name} (-${d})`,'lp');
+        trackHit(targetIdx);
+      }
+      break;
+    }
+    case'charge':{
+      G.charging={agentIdx,skill};
+      addLog(`📜 ${agent.name} begins charging Public Consultation...`,'lp');
+      spendAP(agentIdx,skill.ap);
+      G.turn++;renderAll();setTimeout(nextTurn,400);return;
+    }
+    case'atkdown':{
+      G.enemies.filter(e=>e.hp>0).forEach(e=>{e.statuses.atk_down=skill.dur;});
+      addLog(`📋 Regulatory Framework → all enemies ATK -20% for ${skill.dur} turns`,'lp');
+      break;
+    }
+    case'bot_single':{
+      G.bots.push({type:'single',turnsLeft:skill.botDur,targetId:targetIdx});
+      addLog(`🤖 Inspector Bot deployed! Attacks ${target.name} ${skill.botDur} turns`,'lp');
+      break;
+    }
+    case'bot_aoe':{
+      G.bots.push({type:'aoe',turnsLeft:skill.botDur});
+      addLog(`🛡️ Compliance Bot deployed! 5 dmg all enemies ${skill.botDur} turns`,'lp');
+      break;
+    }
+    case'hack':{
+      const debuffs=['broken','miss','mark'];
+      G.enemies.filter(e=>e.hp>0).forEach(e=>{
+        const pick=debuffs[Math.floor(Math.random()*debuffs.length)];
+        if(pick==='broken') e.statuses.broken=2;
+        else if(pick==='miss') e.statuses.miss=2;
+        else if(pick==='mark') e.statuses.mark=Math.max(e.statuses.mark||0,2);
+        addLog(`💻 Hack → ${e.name} infected: ${pick==='broken'?'ATK↓':pick==='miss'?'MISS30%':'MARK'}!`,'lp');
+        floatTxt('HACKED',getEnemyX(G.enemies.indexOf(e)),'#4ade80');
+      });
+      break;
+    }
+    case'pasta':{
+      // Show 3 random dishes — player picks one
+      const shuffled=[...PASTA_DISHES].sort(()=>Math.random()-0.5);
+      const dishes=shuffled.slice(0,3);
+      showPastaChoice3(dishes,(chosen)=>{chosen.fn(G);spendAP(agentIdx,skill.ap);renderAll();advanceTurn();});
+      return;
+    }
+    case'awareness':{
+      G.enemies.filter(e=>e.hp>0).forEach(e=>{e.statuses.broken=skill.dur;e.statuses.miss=skill.dur;});
+      addLog(`📣 Public Awareness Campaign → all enemies ATK -30%, 30% miss for ${skill.dur} turns`,'lp');
+      break;
+    }
+    case'awareness_choice':{
+      // Player chooses: ATK down OR miss chance (nerf vs old both-at-once)
+      spendAP(agentIdx,skill.ap);
+      document.getElementById('target-prompt').innerHTML=`
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <button class="dir-btn" onclick="applyAwareness('atk',${skill.dur})">📉 ATK -30% (${skill.dur}t)</button>
+          <button class="dir-btn" onclick="applyAwareness('miss',${skill.dur})">💨 30% Miss chance (${skill.dur}t)</button>
+        </div>`;
+      return;
+    }
+    case'outreach':{
+      G.globalBuffs.outreach=skill.dur;
+      addLog(`📢 Outreach Drive → all allies +20% damage for ${skill.dur} turns!`,'lp');
+      break;
+    }
+    case'broken':{
+      if(target.special==='debuff_resist'&&Math.random()<0.5){
+        addLog(`${target.name} → Objection! Debuff resisted!`,'le');
+        floatTxt('RESISTED',getEnemyX(targetIdx),'#94a3b8');
+        break;
+      }
+      target.statuses.broken=skill.dur;
+      addLog(`🎯 Targeted Messaging → ${target.name} ATK -30% for ${skill.dur} turns`,'lp');
+      break;
+    }
+    case'budget_approval':{
+      const chosen = targetType==='ally_choose' ? G.party[targetIdx] : G.party.filter(p=>p.hp>0).reduce((a,b)=>a.hp<b.hp?a:b);
+      const wi=G.party.indexOf(chosen);
+      const amt=rand(...skill.amt);const h=Math.min(chosen.maxHp-chosen.hp,amt);
+      chosen.hp+=h;G.gameStats.heal+=h;
+      const bad=['stun','dot','broken','atk_down','miss','inj','script'];const k=bad.find(k=>chosen.statuses[k]);
+      if(k){delete chosen.statuses[k];}
+      addLog(`🥂 Dinner & Dance → ${chosen.name} +${h} HP${k?` and ${k} removed!`:''}`,'lh');
+      floatTxt(`+${h}`,getPlayerX(wi),'#4ade80');
+      animUnit('player-'+wi,'heal-anim');break;
+    }
+    case'reallocation':{
+      const alive=G.party.filter(p=>p.hp>0);
+      if(alive.length<2){addLog('Need at least 2 alive allies','ls');reEnableButtons();return;}
+      // targetIdx is [idxA, idxB] from the two-step picker
+      const pA=Array.isArray(targetIdx)?G.party[targetIdx[0]]:alive.reduce((a,b)=>a.ap>b.ap?a:b);
+      const pB=Array.isArray(targetIdx)?G.party[targetIdx[1]]:alive.reduce((a,b)=>a.ap<b.ap?a:b);
+      if(pA===pB){addLog('Choose two different allies','ls');reEnableButtons();return;}
+      spendAP(agentIdx,skill.ap);
+      const pool=pA.ap+pB.ap;
+      const share=Math.floor(pool/2);
+      const remainder=pool%2;
+      // Give the bonus AP to whichever had more originally
+      const [hi,lo]=pA.ap>=pB.ap?[pA,pB]:[pB,pA];
+      hi.ap=share+remainder;lo.ap=share;
+      addLog(`♻️ Budget Reallocation → ${pA.name} (→${pA.ap}AP) ↔ ${pB.name} (→${pB.ap}AP)`,'lh');
+      floatTxt(`${pA.ap}AP`,getPlayerX(G.party.indexOf(pA)),'#fbbf24');
+      floatTxt(`${pB.ap}AP`,getPlayerX(G.party.indexOf(pB)),'#4ade80');
+      advanceTurn();return;
+    }
+    case'proc_request':{
+      const chosen=G.party[targetIdx];
+      if(!chosen||chosen.hp<=0){addLog('Invalid target','ls');reEnableButtons();return;}
+      if(chosen.ap>=G.maxAP){addLog(`${chosen.name} is already at max AP!`,'ls');reEnableButtons();return;}
+      chosen.ap=Math.min(G.maxAP,chosen.ap+1);
+      addLog(`🔎 Procurement Request → ${chosen.name} +1 AP (now ${chosen.ap}AP)`,'lh');
+      floatTxt(`+1 AP`,getPlayerX(G.party.indexOf(chosen)),'#f0abfc');
+      break;
+    }
+    case'policy_veto':{
+      if(target.boss){addLog(`🏛️ Policy Veto cannot be used on the boss!`,'ls');reEnableButtons();return;}
+      target.statuses.policy_veto=true;
+      addLog(`🏛️ ${agent.name} → Policy Veto → ${target.name}'s next ability will be nullified!`,'lp');
+      floatTxt('VETOED',getEnemyX(targetIdx),'#a78bfa');
+      break;
+    }
+    case'coordination':{
+      if(G.coordUsedThisWave){addLog(`🤝 Inter-Agency Coordination already used this wave!`,'ls');reEnableButtons();return;}
+      const chosen=G.party[targetIdx];
+      if(!chosen||chosen.hp<=0||G.party.indexOf(chosen)===agentIdx){addLog('Invalid target','ls');reEnableButtons();return;}
+      const li=G.party.indexOf(chosen);
+      G.coordUsedThisWave=true;
+      G.coordGranted=li;
+      addLog(`🤝 Inter-Agency Coordination → ${chosen.name} gets a free skill! (once per wave)`,'lp');
+      spendAP(agentIdx,skill.ap);renderAll();
+      setTimeout(()=>renderActionPanel(chosen,li),500);
+      return;
+    }
+  }
+
+  spendAP(agentIdx,skill.ap);advanceTurn();
+}
+
+function resolveCharge(idx){
+  const {skill}=G.charging;G.charging=null;
+  const d=rand(...skill.dmg);
+  let mult=1;
+  if(G.globalBuffs.outreach>0)mult*=1.2;
+  if(G.globalBuffs.directiveAudit>0)mult*=1.2;
+  const final=Math.round(d*mult);
+  G.enemies.filter(e=>e.hp>0).forEach(e=>{
+    applyDmgToEnemy(G.enemies.indexOf(e),final);
+  });
+  addLog(`🔮 PUBLIC CONSULTATION fires! All enemies -${final} magic dmg!`,'lp');
+  // AP was already spent when charge was cast — don't spend again
+  G.turn++;
+  setTimeout(()=>{renderAll();setTimeout(nextTurn,350);},450);
+}
+
+function spendAP(agentIdx,cost){
+  G.party[agentIdx].ap=Math.max(0,G.party[agentIdx].ap-cost);
+}
+
+function advanceTurn(){
+  // If this was a coordinated free skill, clear the coord state and resume normal turn
+  if(G.coordGranted!==null){
+    G.coordGranted=null;
+    // Resume from where the queue was — don't increment G.turn since coord didn't consume a queue slot
+    setTimeout(()=>{renderAll();setTimeout(nextTurn,350);},450);
+    return;
+  }
+  G.turn++;
+  setTimeout(()=>{renderAll();setTimeout(nextTurn,350);},450);
+}
+
+function trackHit(enemyIdx){
+  const id=G.enemies[enemyIdx]?.id||'e'+enemyIdx;
+  G.hitsThisTurn[id]=(G.hitsThisTurn[id]||0)+1;
+  // bilateral
+  if(G.globalBuffs.bilateral>0&&G.enemies[enemyIdx]?.hp>0){
+    G.enemies[enemyIdx].hp=Math.max(0,G.enemies[enemyIdx].hp-5);
+    G.gameStats.dmg+=5;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  ENEMY TURN
+// ═══════════════════════════════════════════════
+
+function doEnemyTurn(idx){
+  const e=G.enemies[idx];
+  if(!e||e.hp<=0){G.turn++;setTimeout(nextTurn,100);return;}
+
+  if(e.statuses.stun){
+    addLog(`⚡ ${e.name} is STUNNED — skips turn`,'ls');
+    G.turn++;setTimeout(nextTurn,500);return;
+  }
+
+  e._turnsAlive=(e._turnsAlive||0)+1;
+
+  const alive=G.party.filter(p=>p.hp>0);
+  if(!alive.length){G.turn++;setTimeout(nextTurn,100);return;}
+
+  let atk=e.atk;
+  if(e.statuses.atk_down) atk=Math.round(atk*0.8);
+  if(e.statuses.broken)   atk=Math.round(atk*0.7);
+
+  // pick ability
+  let ability=null;
+  if(e.statuses.inj){
+    // injunction: force basic attack only
+    ability=e.abilities?e.abilities[0]:{fn:'basic',name:'Basic Attack'};
+  } else if(e.boss&&e.phases){
+    const pct=e.hp/e.maxHp;
+    let activePhase=e.phases[0];
+    for(const ph of e.phases){
+      if(pct<=ph.threshold&&ph.threshold<=activePhase.threshold) activePhase=ph;
+    }
+    ability={...activePhase.ability};
+  } else {
+    ability=e.abilities[Math.floor(Math.random()*e.abilities.length)];
+  }
+
+  // check policy_veto — nullify the next non-basic ability entirely
+  if(e.statuses.policy_veto&&ability.fn!=='basic'){
+    delete e.statuses.policy_veto;
+    addLog(`🏛️ ${e.name}'s ${ability.name} was Policy Vetoed — nullified!`,'ls');
+    floatTxt('VETOED!',getEnemyX(idx),'#a78bfa');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // file recovery (Paper Pusher)
+  if(ability.fn==='self_heal'&&e._turnsAlive%ability.every===0){
+    e.hp=Math.min(e.maxHp,e.hp+ability.amt);
+    addLog(`${e.name} → File Recovery: +${ability.amt} HP`,'le');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // transfer_hp (Tax Evader)
+  if(ability.fn==='transfer_hp'&&e._turnsAlive%ability.every===0){
+    const other=G.enemies.find(o=>o!==e&&o.hp>0);
+    if(other){other.hp=Math.min(other.maxHp,other.hp+ability.amt);addLog(`${e.name} → Offshore Transfer: +${ability.amt} HP to ${other.name}`,'le');}
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // self_heal_once
+  if(ability.fn==='self_heal_once'&&!e._healedOnce&&e.hp/e.maxHp<=ability.threshold){
+    e._healedOnce=true;e.hp=Math.min(e.maxHp,e.hp+ability.amt);
+    addLog(`${e.name} → ${ability.name}: +${ability.amt} HP!`,'le');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // remove_debuffs_self (legacy, keep for easy)
+  if(ability.fn==='remove_debuffs_self'){
+    ['mark','broken','atk_down','dot','script','inj'].forEach(k=>delete e.statuses[k]);
+    addLog(`${e.name} → Golden Parachute: all debuffs removed!`,'le');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // remove_debuffs_heal — fires randomly each turn below 33% (standard/hard)
+  if(ability.fn==='remove_debuffs_heal'){
+    if(e.hp/e.maxHp<=0.33&&Math.random()<0.45){
+      ['mark','broken','atk_down','dot','script','inj'].forEach(k=>delete e.statuses[k]);
+      const healAmt=G.diff==='hard'?30:0;
+      if(healAmt>0){e.hp=Math.min(e.maxHp,e.hp+healAmt);}
+      addLog(`${e.name} → Golden Parachute: debuffs cleared${healAmt?` + ${healAmt} HP recovered`:''}!`,'le');
+      floatTxt('PARACHUTE!',getEnemyX(idx),'#fbbf24');
+      G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+    }
+    // didn't trigger — fall through to normal attack
+  }
+
+  // buff_ally_atk
+  if(ability.fn==='buff_ally_atk'){
+    const other=G.enemies.find(o=>o!==e&&o.hp>0);
+    if(other){other.atk=Math.round(other.atk*(1+ability.amt));addLog(`${e.name} → Rubber Stamp: ${other.name} ATK +${Math.round(ability.amt*100)}%`,'le');}
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // mark_target (Senior Manager)
+  if(ability.fn==='mark_target'){
+    const tgt=alive[Math.floor(Math.random()*alive.length)];
+    tgt._marked_bonus=ability.bonusDmg;
+    addLog(`${e.name} → Performance Review → ${tgt.name} is marked (+${ability.bonusDmg} dmg if hit this turn)`,'le');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  // aoe_weak
+  if(ability.fn==='aoe_weak'){
+    const d=Math.round(ability.dmg*(e.statuses.miss&&Math.random()<0.3?0:1));
+    G.party.filter(p=>p.hp>0).forEach(p=>{
+      const actual=applyDmgToParty(p,d);
+      addLog(`${e.name} → ${ability.name} → ${p.name} (-${actual})`,'le');
+    });
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,500);},600);return;
+  }
+
+  // miss check
+  if(e.statuses.miss&&Math.random()<0.3){
+    addLog(`${e.name} → ${ability.name} — MISSED!`,'ls');
+    G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,400);},500);return;
+  }
+
+  const targetP=alive[Math.floor(Math.random()*alive.length)];
+  const pi=G.party.indexOf(targetP);
+  let dmg=Math.round(atk*(0.85+Math.random()*0.3));
+
+  // double/triple hit
+  const hits=ability.fn==='double_hit'?2:ability.fn==='triple_hit'?3:1;
+  let totalDmg=0;
+  for(let i=0;i<hits;i++){
+    const h=Math.round(dmg*(0.85+Math.random()*0.3));
+    const actual=applyDmgToParty(targetP,h);
+    totalDmg+=actual;
+  }
+
+  if(hits>1) addLog(`${e.name} → ${ability.name} → ${targetP.name} (-${totalDmg} in ${hits} hits!)`,'le');
+  else addLog(`${e.name} → ${ability.name} → ${targetP.name} (-${totalDmg})`,'le');
+
+  G.turn++;setTimeout(()=>{renderAll();setTimeout(nextTurn,500);},600);
+}
+
+function applyDmgToParty(p,dmg){
+  if(p.statuses.shield){delete p.statuses.shield;addLog(`🛡️ ${p.name}'s shield blocks the hit!`,'lh');return 0;}
+  if(p.statuses.tax_relief){dmg=Math.round(dmg*0.7);}
+  const marked_bonus=p._marked_bonus||0;p._marked_bonus=0;
+  const total=dmg+marked_bonus;
+  p.hp=Math.max(0,p.hp-total);
+  // deadline
+  if(p.hp<=0&&p.statuses.deadline){p.hp=1;delete p.statuses.deadline;addLog(`📅 Extension of Deadline saves ${p.name} on 1 HP!`,'lh');floatTxt('SAVED!',getPlayerX(G.party.indexOf(p)),'#f0abfc');}
+  const pi=G.party.indexOf(p);
+  animUnit('player-'+pi,'hit-anim');
+  floatTxt(`-${total}`,getPlayerX(pi),'#f87171');
+  return total;
+}
+
+function applyDmgToEnemy(idx,dmg){
+  const e=G.enemies[idx];if(!e||e.hp<=0)return;
+  // first_hit_immune (Offshore Account)
+  if(e.special==='first_hit_immune'){
+    if(!e._firstHitDone){e._firstHitDone=true;addLog(`${e.name} → Shell Protection absorbed the hit!`,'ls');floatTxt('BLOCKED',getEnemyX(idx),'#94a3b8');return;}
+  }
+  // counter (Auditor Enemy)
+  if(e.special==='counter'||e.statuses.counter){
+    const cd=e.abilities.find(a=>a.fn==='counter');
+    if(cd){
+      const attacker=G.party.filter(p=>p.hp>0)[0];
+      if(attacker){attacker.hp=Math.max(0,attacker.hp-cd.dmg);addLog(`${e.name} → Counter Audit → reflects ${cd.dmg} damage!`,'le');}
+    }
+  }
+  e.hp=Math.max(0,e.hp-dmg);
+  G.gameStats.dmg+=dmg;
+  animUnit('enemy-sprite-'+idx,'hit-anim');
+  floatTxt(`-${dmg}`,getEnemyX(idx),'#f87171');
+}
+
+// ═══════════════════════════════════════════════
+//  DIRECTIVES
+// ═══════════════════════════════════════════════
+
+function useDirective(type){
+  if(G.shaneCD>0)return;
+  if(type==='damage'){
+    G.directiveActive='damage';
+    addLog(`⚡ SHANE: Damage Boost — next skill hit +30% dmg!`,'ls');
+    floatTxt('⚡ BOOST!',window.innerWidth/2-30,160,'#fbbf24');
+  } else {
+    G.globalBuffs.directiveAudit=2;
+    addLog(`🔍 SHANE: Full Audit — all enemies take +20% dmg for 2 turns!`,'ls');
+    floatTxt('FULL AUDIT',window.innerWidth/2-40,160,'#4fc3f7');
+  }
+  G.shaneCD=3;renderDirectives();renderAll();
+}
+
+// ═══════════════════════════════════════════════
+//  PASTA POPUP
+// ═══════════════════════════════════════════════
+
+function showPastaPopup(dish,cb){
+  const overlay=document.createElement('div');
+  overlay.className='pasta-popup';
+  overlay.innerHTML=`
+    <div class="pasta-card">
+      <div class="pasta-emoji">${dish.icon}</div>
+      <div class="pasta-name">${dish.name}</div>
+      <div class="pasta-effect">${dish.effect}</div>
+      <button class="btn btn-gold">SERVE IT!</button>
+    </div>
+  `;
+  overlay.querySelector('.btn').onclick=()=>{overlay.remove();cb();};
+  document.body.appendChild(overlay);
+}
+
+// Bethany: show 3 dishes, player picks one
+function showPastaChoice3(dishes,cb){
+  const overlay=document.createElement('div');
+  overlay.className='pasta-popup';
+  const cardsHtml=dishes.map((d,i)=>`
+    <div class="pasta-choice-btn" id="pc${i}" style="flex:1;min-width:110px;background:#0d1526;border:2px solid #1e3358;border-radius:8px;padding:10px 6px;cursor:pointer;text-align:center;transition:border-color 0.15s;">
+      <div style="font-size:1.8rem;">${d.icon}</div>
+      <div style="font-family:var(--pixel);color:var(--gold);font-size:0.32rem;line-height:1.8;margin:4px 0;">${d.name}</div>
+      <div style="font-size:0.65rem;color:var(--muted);line-height:1.4;">${d.effect}</div>
+    </div>`).join('');
+  overlay.innerHTML=`
+    <div class="pasta-card" style="max-width:400px;">
+      <div style="font-family:var(--pixel);color:var(--gold);font-size:0.45rem;line-height:1.8;margin-bottom:12px;">🍝 RECIPEBOT: CHOOSE A DISH</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">${cardsHtml}</div>
+    </div>`;
+  dishes.forEach((d,i)=>{
+    const btn=overlay.querySelector(`#pc${i}`);
+    btn.onmouseenter=function(){this.style.borderColor='#fbbf24';};
+    btn.onmouseleave=function(){this.style.borderColor='#1e3358';};
+    btn.onclick=()=>{overlay.remove();cb(d);};
+  });
+  document.body.appendChild(overlay);
+}
+
+// Arif awareness_choice callback — called from inline button
+function applyAwareness(mode,dur){
+  document.getElementById('target-prompt').innerHTML='';
+  if(mode==='atk'){
+    G.enemies.filter(e=>e.hp>0).forEach(e=>{e.statuses.broken=dur;});
+    addLog(`📣 Public Awareness Campaign → all enemies ATK -30% for ${dur} turns`,'lp');
+  } else {
+    G.enemies.filter(e=>e.hp>0).forEach(e=>{e.statuses.miss=dur;});
+    addLog(`📣 Public Awareness Campaign → all enemies 30% miss chance for ${dur} turns`,'lp');
+  }
+  renderAll();advanceTurn();
+}
+
+// ═══════════════════════════════════════════════
+//  RESULT
+// ═══════════════════════════════════════════════
+
+function showResult(victory){
+  showScreen('result-screen');
+  const t=document.getElementById('result-title');
+  t.textContent=victory?'🏆 CASE CLOSED':'📁 CASE DISMISSED';
+  t.className='result-title '+(victory?'rv':'rl');
+  const survivors=G.party.filter(p=>p.hp>0).map(p=>p.name.split(' ')[0]).join(', ')||'None';
+  document.getElementById('result-card').innerHTML=`
+    <div class="r-row"><span>OUTCOME</span><span class="r-val">${victory?'VICTORY':'DEFEAT'}</span></div>
+    <div class="r-row"><span>DIFFICULTY</span><span class="r-val">${G.diff.toUpperCase()}</span></div>
+    <div class="r-row"><span>WAVES CLEARED</span><span class="r-val">${G.wave}/3</span></div>
+    <div class="r-row"><span>ROUNDS TAKEN</span><span class="r-val">${G.gameStats.rounds}</span></div>
+    <div class="r-row"><span>DAMAGE DEALT</span><span class="r-val">${G.gameStats.dmg}</span></div>
+    <div class="r-row"><span>HEALING DONE</span><span class="r-val">${G.gameStats.heal}</span></div>
+    <div class="r-row"><span>SURVIVORS</span><span class="r-val">${survivors}</span></div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+
+function addLog(msg,cls){
+  const log=document.getElementById('battle-log');
+  if(!log)return;
+  const d=document.createElement('div');
+  d.className='log-entry '+(cls||'ls');d.textContent=msg;
+  log.appendChild(d);log.scrollTop=log.scrollHeight;
+}
+function clearLog(){const l=document.getElementById('battle-log');if(l)l.innerHTML='';}
+
+function floatTxt(text,x,color){
+  const d=document.createElement('div');
+  d.className='float-txt';d.textContent=text;d.style.color=color||'#fff';
+  d.style.left=(x||window.innerWidth/2)+'px';
+  d.style.top=(window.innerHeight*0.4)+'px';
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(),1250);
+}
+
+function animUnit(id,cls){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls),450);
+}
+
+function getEnemyX(idx){
+  const el=document.getElementById('enemy-sprite-'+idx)||document.querySelector('#bf-enemies .sprite-unit:nth-child('+(idx+1)+')');
+  if(!el)return window.innerWidth*0.72;
+  const r=el.getBoundingClientRect();return r.left+r.width/2-12;
+}
+function getPlayerX(idx){
+  const el=document.getElementById('player-'+idx);
+  if(!el)return window.innerWidth*0.28;
+  const r=el.getBoundingClientRect();return r.left+r.width/2-12;
+}
+</script>
+
+</body>
+</html>
