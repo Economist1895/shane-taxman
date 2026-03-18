@@ -1047,9 +1047,9 @@ const AGENTS = [
     tags:['support','control'],
     hp:70,maxHp:70,
     skills:[
-      {name:'Policy Veto',icon:'🏛️',desc:"The next ability this enemy uses this wave is completely nullified — no damage, no effect. Cannot be used on bosses.",type:'policy_veto',target:'single',ap:1},
-      {name:'Inter-Agency Coordination',icon:'🤝',desc:'Choose an ally — they immediately use one skill for free. Once per wave.',type:'coordination',target:'ally_choose',ap:2},
-      {name:'Fiscal Review',icon:'📉',desc:'One enemy takes +15% more damage for 3 turns. Can be stacked with other mark effects — each stack extends the duration.',type:'debuff',effect:'mark',dur:3,stack:true,target:'single',ap:1},
+      {name:'Policy Veto',icon:'🏛️',desc:"Nullify the next ability this enemy uses — no damage, no effect. On bosses, 50% chance to succeed.",type:'policy_veto',target:'single',ap:1},
+      {name:'Inter-Agency Coordination',icon:'🤝',desc:'Choose an ally — they immediately use one skill for free. Once per wave.',type:'coordination',target:'ally_choose',ap:1},
+      {name:'Fiscal Review',icon:'📉',desc:'Deal 15 damage and mark the target — they take +15% more damage for 3 turns. Can be stacked to extend the duration.',type:'debuff',effect:'mark',dur:3,stack:true,dmg:15,target:'single',ap:1},
     ]
   },
 ];
@@ -1093,9 +1093,9 @@ const ENEMY_POOL = {
     {name:'Offshore Account',hp:88,maxHp:88,atk:11,v:2,special:'first_hit_immune',abilities:[{name:'Basic Attack',fn:'basic'},{name:'Shell Protection',fn:'basic'}]},
   ],
   hard:[
-    {name:'Senior Manager',hp:125,maxHp:125,atk:18,v:0,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Performance Review',fn:'mark_target',bonusDmg:15}]},
-    {name:'Legal Counsel',hp:112,maxHp:112,atk:15,v:1,special:'debuff_resist',abilities:[{name:'Basic Attack',fn:'basic'},{name:'Objection',fn:'basic'}]},
-    {name:'Tax Evader',hp:118,maxHp:118,atk:16,v:2,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Offshore Transfer',fn:'transfer_hp',amt:20,every:3}]},
+    {name:'Senior Manager',hp:106,maxHp:106,atk:18,v:0,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Performance Review',fn:'mark_target',bonusDmg:15}]},
+    {name:'Legal Counsel',hp:95,maxHp:95,atk:15,v:1,special:'debuff_resist',abilities:[{name:'Basic Attack',fn:'basic'},{name:'Objection',fn:'basic'}]},
+    {name:'Tax Evader',hp:100,maxHp:100,atk:16,v:2,abilities:[{name:'Basic Attack',fn:'basic'},{name:'Offshore Transfer',fn:'transfer_hp',amt:20,every:3}]},
   ],
 };
 
@@ -1116,12 +1116,12 @@ const BOSSES = {
     ]
   },
   hard:{
-    name:'The CFO (Hostile Takeover)',hp:210,maxHp:210,atk:26,v:0,boss:true,
+    name:'The CFO (Hostile Takeover)',hp:170,maxHp:170,atk:26,v:0,boss:true,
     phases:[
       {threshold:1.0,ability:{name:'Offshore Transfer',fn:'self_heal_once',amt:25,threshold:0.66}},
       {threshold:0.66,ability:{name:'Bonus Extraction',fn:'double_hit'}},
       {threshold:0.33,ability:{name:'Golden Parachute',fn:'remove_debuffs_heal'}},
-      {threshold:0.2,ability:{name:'Hostile Takeover',fn:'triple_hit'}},
+      {threshold:0.15,ability:{name:'Hostile Takeover',fn:'triple_hit'}},
     ]
   },
 };
@@ -1194,7 +1194,7 @@ const AGENT_SUMMARY = {
   bethany:  'Flexible disruptor. Hack applies a random debuff to each enemy instantly. RecipeBot gives situational utility each turn.',
   arif:     'Debuff controller. Choose between cutting enemy damage or forcing misses. Outreach Drive boosts the whole team.',
   angel:    'AP manager. Dinner & Dance heals and cleanses a chosen ally. Reallocation lets you pick two allies and evenly splits their combined AP. Procurement Request gives +1AP to whoever needs it most.',
-  jasper:   'Coordinator. Policy Veto nullifies an enemy\'s next ability before it fires. Coordination grants an ally a free skill once per wave.',
+  jasper:   'Coordinator. Coordination (1AP) grants an ally a free skill once per wave — pairs well with any 2AP skill. Policy Veto nullifies enemy abilities; works on the boss at 50% odds. Fiscal Review deals 15 damage and marks for +15% damage taken.',
 };
 
 function renderRoster(){
@@ -1430,6 +1430,11 @@ function loadWave(){
   G.enemies=pickEnemies(G.wave);
   G.bots=[];G.enrageCounter=0;G.enraged=false;
   G.hitsThisTurn={};G.coordUsedThisWave=false;
+  // Hard mode: grant +1 AP per agent after each non-boss wave clear
+  if(G.diff==='hard'&&G.wave>0&&G.wave<2){
+    G.party.forEach(p=>{if(p.hp>0)p.ap=Math.min(G.maxAP,p.ap+2);});
+    addLog(`[ WAVE BONUS: each surviving agent gains +2 AP ]`,'lh');
+  }
   document.getElementById('mb-title').textContent=
     G.wave===2?`BOSS: ${G.enemies[0].name}`:`OPERATION SHELL`;
   document.getElementById('mb-wave').textContent=`WAVE ${G.wave+1}/3`;
@@ -1630,6 +1635,7 @@ function renderActionPanel(agent,forcedAgentIdx){
     btn.className='skill-btn';
     let disabled=sk.ap>0&&agent.ap<sk.ap;
     if(sk.type==='crossref'&&!G.enemies.some(e=>e.hp>0&&e.statuses.mark)) disabled=true;
+    if(sk.type==='caffeine'&&(agent.ap>=G.maxAP||agent.hp<=15)) disabled=true;
     btn.disabled=disabled;
     btn.innerHTML=`
       <span class="sk-icon">${sk.icon}</span>
@@ -2101,7 +2107,14 @@ function execSkill(agentIdx,skill,targetIdx,targetType){
         }
         const existing=target.statuses.mark||0;
         target.statuses.mark=skill.stack?Math.max(existing+1,skill.dur):skill.dur;
-        addLog(`${agent.name} → ${skill.name} → ${target.name} takes +15% more damage${skill.stack&&existing?' (stacked!)':''}`,'lp');
+        if(skill.dmg){
+          const d=Math.round(skill.dmg*dmgMult);
+          applyDmgToEnemy(targetIdx,d);
+          addLog(`${agent.name} → ${skill.name} → ${target.name}: -${d} dmg + takes +15% more damage${skill.stack&&existing?' (stacked!)':''}`,'lp');
+          trackHit(targetIdx);
+        } else {
+          addLog(`${agent.name} → ${skill.name} → ${target.name} takes +15% more damage${skill.stack&&existing?' (stacked!)':''}`,'lp');
+        }
       }
       break;
     }
@@ -2145,6 +2158,7 @@ function execSkill(agentIdx,skill,targetIdx,targetType){
     case'caffeine':{
       // 0AP cost — gain +2AP, lose 15 HP. Handled specially since ap:0
       if(agent.hp<=15){addLog(`☕ ${agent.name} → Can't push further — too low HP!`,'ls');reEnableButtons();return;}
+      if(agent.ap>=G.maxAP){addLog(`☕ ${agent.name} → Already at max AP — no point!`,'ls');reEnableButtons();return;}
       agent.ap=Math.min(G.maxAP,agent.ap+2);
       agent.hp=Math.max(1,agent.hp-15);
       addLog(`☕ ${agent.name} → Caffeine Override! +2 AP, -15 HP (now ${agent.hp} HP)`,'lp');
@@ -2152,6 +2166,7 @@ function execSkill(agentIdx,skill,targetIdx,targetType){
       floatTxt('-15',getPlayerX(agentIdx),'#f87171');
       animUnit('player-'+agentIdx,'hit-anim');
       renderAll();
+      renderActionPanel(agent,agentIdx);
       // don't advance turn — player keeps acting
       return;
     }
@@ -2290,7 +2305,11 @@ function execSkill(agentIdx,skill,targetIdx,targetType){
       break;
     }
     case'policy_veto':{
-      if(target.boss){addLog(`🏛️ Policy Veto cannot be used on the boss!`,'ls');reEnableButtons();return;}
+      if(target.boss&&Math.random()<0.5){
+        addLog(`🏛️ ${agent.name} → Policy Veto → BLOCKED by the CFO's legal team!`,'ls');
+        floatTxt('BLOCKED',getEnemyX(targetIdx),'#94a3b8');
+        break;
+      }
       target.statuses.policy_veto=true;
       addLog(`🏛️ ${agent.name} → Policy Veto → ${target.name}'s next ability will be nullified!`,'lp');
       floatTxt('VETOED',getEnemyX(targetIdx),'#a78bfa');
