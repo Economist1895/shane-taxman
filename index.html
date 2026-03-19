@@ -909,7 +909,7 @@ const CHARACTER_DATA = [
     skills:[
       {name:'Input Tax', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self 100 HP'},
       {name:'Output Tax', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'dmgup', duration:3, desc:'Damage + Damage Received Up on enemy 3 turns'},
-      {name:'Tax Treaty', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally for 2 turns'},
+      {name:'Tax Treaty', mp:15, type:'aoe_buff', target:'party', effect:'dmgdown', duration:3, desc:'Damage Received Down to all party for 3 turns'},
     ]
   },
   {
@@ -954,12 +954,12 @@ const CHARACTER_DATA = [
   },
   {
     id:'angel', name:'Angel Jasmine Loh', role:'Procurement Officer',
-    tags:['heal','buff','util'],
+    tags:['heal','atk','util'],
     hp:340, mp:80, atk:45,
     skills:[
       {name:'Dinner & Dance', mp:15, type:'aoe_heal', target:'party', amount:40, desc:'Small AOE heal (40 HP) to all party'},
       {name:'Procurement Request', mp:10, type:'mp_restore', target:'ally', amount:25, desc:'Restore 25 MP to one ally'},
-      {name:'Budget Allocation', mp:20, type:'double_buff', target:'ally', effect1:'atkup', effect2:'dmgdown', duration:2, desc:'Attack Up + Damage Received Down on ally for 2 turns'},
+      {name:'Omelette Bomb', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'dmgup', duration:2, desc:'Damage (ATK x1.5) + Damage Received Up on enemy for 2 turns'},
     ]
   },
   {
@@ -968,7 +968,7 @@ const CHARACTER_DATA = [
     hp:290, mp:80, atk:65,
     skills:[
       {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'Heavy damage (ATK×2.0) + Stun target 1 turn'},
-      {name:'Violet Defence', mp:20, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down to all party for 2 turns'},
+      {name:'Violet Defence', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally for 2 turns'},
       {name:'Undying Project', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
     ]
   },
@@ -2774,29 +2774,34 @@ const CHAR_SUMMARIES = {
   karishma:  { summary: "The squad's primary healer and only full-strength reviver. Hard to replace on Hard difficulty - protect her.", role: "Healer / Reviver" },
   sylvester: { summary: "Highest ATK in the roster. Pure burst damage with a stun and a debuff. Glass cannon - hits the hardest but needs support.", role: "Attacker / Control" },
   janus:     { summary: "Tactical mage who debuffs enemies, buffs allies, and lands AOE nukes. Sets up teammates for big turns.", role: "Buffer / Debuffer / AOE" },
-  shaun:     { summary: "Tankiest character. Heals himself, makes enemies vulnerable, and shields allies. Slow but nearly unkillable.", role: "Tank / Support" },
+  shaun:     { summary: "The squad's defensive anchor. Self-heals to stay alive, applies Damage Received Up to expose enemies, and shields the whole party with Tax Treaty. Slow but nearly impossible to kill.", role: "Tank / Party Shield" },
   arif:      { summary: "AOE controller who weakens the entire enemy formation. Publicity Campaign and Survey both hit all enemies, setting up President's Challenge drain for maximum recovery.", role: "AOE Debuffer / Drain" },
   bethany:   { summary: "AOE damage dealer who can also disrupt enemies and spot-heal allies. Fragile but versatile. Best in multi-enemy rotations.", role: "AOE / Utility" },
   jiawei:    { summary: "Glass cannon who burns his own HP to hit harder. High risk, high reward. Keep him alive and he will carry rounds.", role: "Attacker / High-risk" },
   richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
-  angel:     { summary: "The squad's MP battery. Restores resources, provides small heals, and can double-buff one ally. Essential on long fights.", role: "Support / Buffer" },
-  jasper:    { summary: "Stun-damage dealer who shields the whole party and can revive fallen allies. Rejected by MOF stuns hard, Violet Defence protects everyone, Undying Project brings them back.", role: "Attacker / Party Shield / Reviver" },
+  angel:     { summary: "The squad's MP battery who can also deal damage. Procurement Request keeps allies casting, Dinner and Dance patches the whole party, and Omelette Bomb deals damage while making enemies more vulnerable.", role: "Support / Attacker" },
+  jasper:    { summary: "Stun-damage dealer who protects a key ally and revives fallen ones. Rejected by MOF hits hard with a stun, Violet Defence guards your most vulnerable officer, Undying Project pulls someone back from KO.", role: "Attacker / Support / Reviver" },
 };
 
 function buildHelpContent() {
   const body = document.getElementById('help-body');
   if (!body) return;
 
-  let html = '<div class="help-intro">Shane commands from the sidelines. You pick 3 officers to fight. Each officer has a Basic Attack (free) and 3 skills that cost MP. Shane has 2 cooldown abilities usable anytime during your turn.</div>';
+  let html = '';
 
-  html += '<div class="help-section-title">Shane Ong - Commander</div>';
+  // Intro
+  html += '<div class="help-intro">Shane Ong commands from the sidelines. Pick 3 officers to fight. Each officer has a free Basic Attack and 3 skills that cost MP. Shane has 2 command skills usable anytime during your turn, each on a cooldown.</div>';
+
+  // Shane section
+  html += '<div class="help-section-title">Shane Ong — Commander</div>';
   html += '<div class="help-char-entry">';
-  html += '<div class="help-char-summary">Does not fight. Uses powerful command skills with cooldowns - available anytime during your team\'s turn.</div>';
+  html += '<div class="help-char-summary">Does not fight directly. Issues commands at any point during your turn.</div>';
   html += '<ul class="help-skill-list">';
-  html += '<li class="help-skill-item"><span class="help-skill-name">"Do Work!" (CD 3)</span> - Boost one ally\'s ATK by 50% for 2 turns. Use before your hardest hitter acts.</li>';
-  html += '<li class="help-skill-item"><span class="help-skill-name">Organise Party (CD 4)</span> - Restore 20 MP to all 3 party members. Use when skills are running dry.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">"Do Work!" (CD: 3)</span> — ATK Up on one ally for 2 turns. Best used just before your strongest attacker acts.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">Organise Party (CD: 4)</span> — Restore 20 MP to all 3 officers. Save for when skills are running dry.</li>';
   html += '</ul></div>';
 
+  // Officers
   html += '<div class="help-section-title">Your Officers</div>';
 
   CHARACTER_DATA.forEach(ch => {
@@ -2806,19 +2811,31 @@ function buildHelpContent() {
     html += `<canvas id="help-sprite-${ch.id}" width="24" height="32" style="image-rendering:pixelated;flex-shrink:0;"></canvas>`;
     html += '<div>';
     html += `<div class="help-char-name">${ch.name}</div>`;
-    html += `<div class="help-char-role">${summary.role || ch.role} - HP ${ch.hp} / MP ${ch.mp} / ATK ${ch.atk}</div>`;
+    html += `<div class="help-char-role">${summary.role || ch.role} &nbsp;|&nbsp; HP ${ch.hp} &nbsp;MP ${ch.mp} &nbsp;ATK ${ch.atk}</div>`;
     html += '</div></div>';
     html += `<div class="help-char-summary">${summary.summary || ''}</div>`;
     html += '<ul class="help-skill-list">';
     ch.skills.forEach(sk => {
-      html += `<li class="help-skill-item"><span class="help-skill-name">${sk.name} (${sk.mp} MP)</span> - ${sk.desc}</li>`;
+      // Build a clean, consistent description line
+      const cost = sk.mp + ' MP';
+      html += `<li class="help-skill-item"><span class="help-skill-name">${sk.name} (${cost})</span> — ${sk.desc}.</li>`;
     });
     html += '</ul></div>';
   });
 
+  // Status effects glossary
+  html += '<div class="help-section-title">Status Effects</div>';
+  html += '<div class="help-char-entry">';
+  html += '<ul class="help-skill-list">';
+  html += '<li class="help-skill-item"><span class="help-skill-name">ATK Up</span> — ATK increased by 50%.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">ATK Down</span> — ATK reduced by 35%.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">DMG Up (on enemy)</span> — Enemy takes 50% more damage. Use before hitting hard.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">DMG Down (on ally)</span> — Ally takes 35% less damage.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">Stun</span> — Target loses their next turn.</li>';
+  html += '</ul></div>';
+
   body.innerHTML = html;
 
-  // Draw sprites
   CHARACTER_DATA.forEach(ch => {
     const canvas = document.getElementById('help-sprite-'+ch.id);
     if (canvas && SPRITES[ch.id]) drawSprite(canvas, SPRITES[ch.id], 2);
