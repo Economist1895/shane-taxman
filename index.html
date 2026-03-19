@@ -762,6 +762,9 @@
   </div>
   <div class="reorder-slots" id="reorder-slots"></div>
   <div class="drag-hint">Tap two characters to swap their order</div>
+  <div id="hp-carry-notice" style="display:none;margin:0 12px 8px;padding:8px 10px;border:1px solid #604020;background:rgba(96,40,0,0.2);font-family:'Press Start 2P',monospace;font-size:6px;color:#c08040;line-height:2;text-align:center;">
+    ⚠ HP carries over from last rotation. MP partially restored.
+  </div>
   <div style="padding:16px;">
     <button class="btn btn-primary" onclick="startRotation()" style="width:100%">BEGIN ROTATION</button>
   </div>
@@ -899,7 +902,7 @@ const CHARACTER_DATA = [
     skills:[
       {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:2, desc:'Attack Down on enemy for 2 turns'},
       {name:'Public Consultation', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
-      {name:'Revenue Games', mp:15, type:'buff', target:'ally', effect:'atkup', duration:3, desc:'Attack Up on one ally for 3 turns'},
+      {name:'Revenue Games', mp:20, type:'aoe_buff', target:'party', effect:'atkup', duration:3, desc:'Attack Up on all party members for 3 turns'},
     ]
   },
   {
@@ -925,7 +928,7 @@ const CHARACTER_DATA = [
   {
     id:'bethany', name:'Bethany Su', role:'AI Lead',
     tags:['atk','util','heal'],
-    hp:260, mp:95, atk:60,
+    hp:260, mp:95, atk:65,
     skills:[
       {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
       {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.3, desc:'Damage + Attack Down + 30% Stun'},
@@ -935,17 +938,17 @@ const CHARACTER_DATA = [
   {
     id:'jiawei', name:'Jiawei Tan', role:'Software Developer',
     tags:['atk','util'],
-    hp:220, mp:80, atk:90,
+    hp:280, mp:80, atk:90,
     skills:[
-      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:1.5, selfHpPct:0.15, desc:'ATK×1.5 damage + lose 15% current HP'},
-      {name:'Deploy Hotfix', mp:15, type:'cleanse', target:'ally', desc:'Remove one debuff from one ally'},
-      {name:'Push to Prod', mp:20, type:'dmg_self_stun', target:'enemy', formula:2.0, selfStunChance:0.15, desc:'Heavy damage + 20% chance self Stun'},
+      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:1.5, selfHpFlat:20, desc:'ATK×1.5 damage + lose 20 HP (can be fatal)'},
+      {name:'Blood Donation', mp:15, type:'revive_self_dmg', target:'ally_ko', selfHpFlat:70, revivePct:0.38, desc:'Lose 70 HP to revive a KO\'d ally at 38% HP (can be fatal)'},
+      {name:'Push to Prod', mp:20, type:'dmg_self_stun', target:'enemy', formula:2.5, selfStunChance:0.20, desc:'Heavy damage (ATK×2.5) + 20% chance self Stun'},
     ]
   },
   {
     id:'richmond', name:'Richmond Yeo', role:'Auditor',
     tags:['debuff','atk'],
-    hp:290, mp:65, atk:65,
+    hp:290, mp:65, atk:79,
     skills:[
       {name:'Audit Finding', mp:10, type:'debuff', target:'enemy', effect:'dmgup', duration:3, desc:'Damage Received Up on enemy for 3 turns'},
       {name:'Tax Recovery', mp:15, type:'dmg_heal_self', target:'enemy', formula:1.5, desc:'Damage + heal self equal to damage dealt'},
@@ -955,7 +958,7 @@ const CHARACTER_DATA = [
   {
     id:'angel', name:'Angel Jasmine Loh', role:'Procurement Officer',
     tags:['heal','atk','util'],
-    hp:340, mp:80, atk:45,
+    hp:340, mp:95, atk:62,
     skills:[
       {name:'Dinner & Dance', mp:15, type:'aoe_heal', target:'party', amount:40, desc:'Small AOE heal (40 HP) to all party'},
       {name:'Procurement Request', mp:10, type:'mp_restore', target:'ally', amount:25, desc:'Restore 25 MP to one ally'},
@@ -977,7 +980,11 @@ const CHARACTER_DATA = [
 const ENEMY_DATA = {
   minion: {name:'Minion', hp:120, atk:40, isBoss:false},
   sad: {name:'SAD', hp:220, atk:60, isBoss:false},
-  director: {name:'Director', hp:300, atk:75, isBoss:false},
+  director: {name:'Director', hp:300, atk:75, isBoss:false,
+    skills:[
+      {name:'Reject Submission', type:'dmg', formula:2.0},
+    ]
+  },
   ceo: {name:'CEO', hp:700, atk:95, isBoss:true, stunImmune:true,
     skills:[
       {name:'Choose CM Sec', type:'debuff', effect:'atkdown', duration:3, target:'party_member'},
@@ -989,7 +996,7 @@ const ENEMY_DATA = {
 
 const ROTATION_CONFIG = {
   easy: [
-    {enemies:['minion']},
+    {enemies:['minion','sad']},
     {enemies:['sad','director']},
     {enemies:['ceo','director']},
   ],
@@ -1035,13 +1042,10 @@ function initGame(difficulty) {
     enemies: [],
     shaneCooldowns: [0, 0],
     shaneUsedThisTurn: false,
-    currentActorIndex: 0, // which party member is acting
-    actionsThisTurn: [], // which party indices have acted
-    pendingSkill: null,
-    pendingTargetMode: null,
+    currentActorIndex: 0,
+    actionsThisTurn: [],
     enemyQueue: [],
     enemyQueueIndex: 0,
-    log: [],
   };
 }
 
@@ -1155,7 +1159,6 @@ function confirmSquad() {
 // REORDER SCREEN
 // ══════════════════════════════════════════
 
-let reorderDragIdx = null;
 let reorderSwapFirst = null;
 
 function showReorderScreen() {
@@ -1169,6 +1172,8 @@ function showReorderScreen() {
   list.innerHTML = conf.enemies.map(e => `<div class="enemy-chip">${ENEMY_DATA[e].name}</div>`).join('');
 
   buildReorderSlots();
+  const notice = document.getElementById('hp-carry-notice');
+  if (notice) notice.style.display = G.rotationIndex > 0 ? 'block' : 'none';
   showScreen('reorder-screen');
 }
 
@@ -1437,24 +1442,28 @@ function buildSkillButton(ch, sk, si, charIdx) {
   const noMp = ch.mp < sk.mp;
   const noTarget = checkSkillNoTarget(ch, sk, charIdx);
   const disabled = noMp || noTarget ? 'disabled' : '';
-  // #9 MP cost text colour — red when can't afford
   const mpColour = noMp ? 'color:#ff4040' : 'color:#4080ff';
   const reason = noMp ? `Need ${sk.mp} MP` : noTarget ? 'No valid target' : `${sk.mp} MP`;
-  // #9 Richmond bonus damage indicator
+  // Richmond bonus damage indicator
   let bonusTag = '';
   if (sk.type === 'dmg_bonus' && sk.bonusCondition) {
     const aliveEnemies = G.enemies.filter(e => !e.dead);
     const anyHasCond = aliveEnemies.some(e => hasStatus(e, sk.bonusCondition));
     if (anyHasCond) bonusTag = '<span class="bonus-tag">BONUS ACTIVE</span>';
   }
-  // #10 Arif drain: show living enemy count in desc
+  // Arif drain: show living enemy count in desc
   let desc = sk.desc;
   if (sk.type === 'aoe_drain') {
     const liveCount = G.enemies.filter(e=>!e.dead).length;
     desc = sk.desc + ` [${liveCount} target${liveCount!==1?'s':''}]`;
   }
+  // Lethal warning for self-damage skills
+  let lethalTag = '';
+  if (sk.selfHpFlat !== undefined && ch.hp <= sk.selfHpFlat) {
+    lethalTag = '<span class="bonus-tag" style="color:#ff4040;border-color:#ff4040;">LETHAL</span>';
+  }
   return `<button class="action-btn ${disabled}" onclick="useSkill(${charIdx},${si})" ${disabled}>
-    <span class="skill-name">${sk.name}${bonusTag}</span>
+    <span class="skill-name">${sk.name}${bonusTag}${lethalTag}</span>
     <span class="skill-mp" style="${mpColour}">${reason}</span>
     <span class="skill-desc">${desc}</span>
   </button>`;
@@ -1485,15 +1494,14 @@ function useSkill(charIdx, skillIdx) {
   const ch = G.party[charIdx];
   const sk = ch.skills[skillIdx];
   if (ch.mp < sk.mp) return;
-  G.pendingSkill = {charIdx, skillIdx};
   resolveSkillTargeting(charIdx, sk, skillIdx);
 }
 
 function resolveSkillTargeting(charIdx, sk, skillIdx) {
   const t = sk.target || sk.type;
-  if (['aoe_dmg','aoe_heal','aoe_drain','aoe_buff','aoe_debuff','enemies','party'].includes(t) || sk.type === 'aoe_drain') {
+  if (['aoe_dmg','aoe_heal','aoe_drain','aoe_buff','aoe_debuff','enemies','party'].includes(t)) {
     executeSkill(charIdx, skillIdx, null);
-  } else if (sk.type === 'heal_self' || sk.type === 'dmg_self_dmg') {
+  } else if (sk.type === 'heal_self') {
     executeSkill(charIdx, skillIdx, charIdx);
   } else if (sk.target === 'enemy') {
     startTargeting(charIdx, 'skill', skillIdx, 'enemy');
@@ -1720,19 +1728,33 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     target.hp = revHp;
     target.ko = false;
     removeStatus(target, 'stun');
+    if (!G.actionsThisTurn.includes(targetIdx)) G.actionsThisTurn.push(targetIdx);
     floatNumber(revHp, 'party-card-'+targetIdx, 'heal');
-    addLog(`${ch.name} revives ${target.name} with ${revHp} HP!`, 'heal');
+    addLog(`${ch.name} revives ${target.name} with ${revHp} HP! (acts next turn)`, 'heal');
+  }
+  else if (t === 'revive_self_dmg') {
+    const target = G.party[targetIdx];
+    const revHp = Math.floor(target.maxHp * sk.revivePct);
+    target.hp = revHp;
+    target.ko = false;
+    removeStatus(target, 'stun');
+    if (!G.actionsThisTurn.includes(targetIdx)) G.actionsThisTurn.push(targetIdx);
+    floatNumber(revHp, 'party-card-'+targetIdx, 'heal');
+    const selfCost = sk.selfHpFlat !== undefined ? sk.selfHpFlat : Math.floor(ch.hp * sk.selfHpPct);
+    ch.hp = Math.max(0, ch.hp - selfCost);
+    floatNumber(selfCost, 'party-card-'+charIdx, 'damage');
+    if (ch.hp === 0) {
+      ch.ko = true;
+      ch.status = [];
+      addLog(`${ch.name} uses ${sk.name} — revives ${target.name} with ${revHp} HP, but gives everything!`, 'ko');
+    } else {
+      addLog(`${ch.name} uses ${sk.name} — loses ${selfCost} HP to revive ${target.name} with ${revHp} HP!`, 'heal');
+    }
   }
   else if (t === 'buff') {
     const target = G.party[targetIdx];
     applyStatus(target, sk.effect, sk.duration);
     addLog(`${ch.name} uses ${sk.name} — ${target.name} gains ${STATUS_LABELS[sk.effect]?.label}!`, 'buff');
-  }
-  else if (t === 'double_buff') {
-    const target = G.party[targetIdx];
-    applyStatus(target, sk.effect1, sk.duration);
-    applyStatus(target, sk.effect2, sk.duration);
-    addLog(`${ch.name} uses ${sk.name} — ${target.name} gains ${STATUS_LABELS[sk.effect1]?.label} + ${STATUS_LABELS[sk.effect2]?.label}!`, 'buff');
   }
   else if (t === 'aoe_buff') {
     let msg = `${ch.name} uses ${sk.name}!`;
@@ -1782,20 +1804,24 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
         addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}! ${STATUS_LABELS[sk.effect]?.label} applied.`, 'debuff');
       }
     } else {
-      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}!`, 'damage');
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}! (Defeated)`, 'damage');
     }
   }
   else if (t === 'dmg_self_dmg') {
-    // Caffeine Overload
     const en = G.enemies[targetIdx];
     const dmg = calcDamage(ch, en, sk.formula);
     dealDamageToEnemy(targetIdx, dmg);
     floatNumber(dmg, 'enemy-card-'+targetIdx, 'damage');
-    const selfCost = Math.max(0, Math.floor(ch.hp * sk.selfHpPct));
-    const actualCost = Math.min(selfCost, ch.hp - 1);
-    ch.hp = Math.max(1, ch.hp - actualCost);
-    floatNumber(actualCost, 'party-card-'+charIdx, 'damage');
-    addLog(`${ch.name} uses ${sk.name} — hits ${en.name} for ${dmg}, loses ${actualCost} HP!`, 'damage');
+    const selfCost = sk.selfHpFlat !== undefined ? sk.selfHpFlat : Math.floor(ch.hp * sk.selfHpPct);
+    ch.hp = Math.max(0, ch.hp - selfCost);
+    floatNumber(selfCost, 'party-card-'+charIdx, 'damage');
+    if (ch.hp === 0) {
+      ch.ko = true;
+      ch.status = [];
+      addLog(`${ch.name} uses ${sk.name} — hits ${en.name} for ${dmg}, but collapses from exhaustion!`, 'ko');
+    } else {
+      addLog(`${ch.name} uses ${sk.name} — hits ${en.name} for ${dmg}, loses ${selfCost} HP!`, 'damage');
+    }
   }
   else if (t === 'dmg_self_stun') {
     const en = G.enemies[targetIdx];
@@ -1832,7 +1858,7 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
       }
     });
     const healed = Math.min(totalDrained, ch.maxHp - ch.hp);
-    ch.hp = Math.min(ch.maxHp, ch.hp + totalDrained);
+    ch.hp = Math.min(ch.maxHp, ch.hp + healed);
     floatNumber(healed, 'party-card-'+charIdx, 'heal');
     msg += ` ${ch.name.split(' ')[0]} recovers ${healed} HP!`;
     addLog(msg, 'heal');
@@ -1849,20 +1875,6 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     target.mp = Math.min(target.maxMp, target.mp + sk.amount);
     floatNumber('+'+restored+'MP', 'party-card-'+targetIdx, 'mp');
     addLog(`${ch.name} restores ${restored} MP to ${target.name}.`, 'buff');
-  }
-  else if (t === 'dmg_strip') {
-    const en = G.enemies[targetIdx];
-    const dmg = calcDamage(ch, en, sk.formula);
-    dealDamageToEnemy(targetIdx, dmg);
-    floatNumber(dmg, 'enemy-card-'+targetIdx, 'damage');
-    const buffs = en.status.filter(s => ['atkup','dmgdown'].includes(s.type));
-    if (buffs.length > 0) {
-      const stripped = buffs[0];
-      removeStatus(en, stripped.type);
-      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}! Strips ${STATUS_LABELS[stripped.type]?.label}!`, 'debuff');
-    } else {
-      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}! (No buffs to strip)`, 'damage');
-    }
   }
 
   checkWipe();
@@ -1989,9 +2001,11 @@ function processNextEnemy() {
   }
 
   // Determine action
-  let action, actionText, actionResult;
+  let action;
   if (en.isBoss && en.skills) {
     action = chooseCEOAction(en);
+  } else if (en.skills && en.skills.length > 0 && Math.random() < 0.25) {
+    action = {type:'director_skill', skill: en.skills[0]};
   } else {
     action = {type:'basic'};
   }
@@ -2002,7 +2016,7 @@ function processNextEnemy() {
     if (targets.length === 0) { endGame(false); return; }
     const target = targets[Math.floor(Math.random() * targets.length)];
     const tIdx = G.party.indexOf(target);
-    const dmg = calcEnemyDamage(en, target);
+    const dmg = calcDamage(en, target);
     dealDamageToParty(tIdx, dmg);
     floatNumber(dmg, 'party-card-'+tIdx, 'damage');
     actionText = `${en.name} attacks ${target.name} for ${dmg} damage!`;
@@ -2045,7 +2059,7 @@ function processNextEnemy() {
     const hits = [];
     G.party.forEach((p, i) => {
       if (!p.ko) {
-        const dmg = calcEnemyDamage(en, p, action.skill.formula);
+        const dmg = calcDamage(en, p, action.skill.formula);
         hits.push({idx:i, dmg, name:p.name});
       }
     });
@@ -2058,6 +2072,24 @@ function processNextEnemy() {
         text += `${h.name.split(' ')[0]} takes ${h.dmg}. `;
       });
       addLog(text, 'damage');
+      tickStatuses(en);
+      G.enemyQueueIndex++;
+      checkWipe();
+      if (!isGameOver()) processNextEnemy();
+    });
+  } else if (action.type === 'director_skill') {
+    const targets = G.party.filter(p => !p.ko);
+    if (targets.length === 0) { endGame(false); return; }
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const tIdx = G.party.indexOf(target);
+    const dmg = calcDamage(en, target, action.skill.formula);
+    dealDamageToParty(tIdx, dmg);
+    floatNumber(dmg, 'party-card-'+tIdx, 'damage');
+    actionText = `${en.name} uses ${action.skill.name} on ${target.name} for ${dmg} damage!`;
+    highlightActiveEnemy(enIdx);
+    showEnemyOverlay(en.name, actionText, () => {
+      clearEnemyHighlight();
+      addLog(actionText, 'damage');
       tickStatuses(en);
       G.enemyQueueIndex++;
       checkWipe();
@@ -2112,20 +2144,10 @@ function endEnemyTurn() {
 // DAMAGE CALC
 // ══════════════════════════════════════════
 
-function calcDamage(attacker, target, formula) {
+function calcDamage(attacker, target, formula=1.0) {
   let atk = attacker.atk;
   if (hasStatus(attacker, 'atkup')) atk = Math.floor(atk * 1.5);
   if (hasStatus(attacker, 'atkdown')) atk = Math.floor(atk * 0.65);
-  let dmg = Math.floor(atk * formula);
-  if (hasStatus(target, 'dmgup')) dmg = Math.floor(dmg * 1.5);
-  if (hasStatus(target, 'dmgdown')) dmg = Math.floor(dmg * 0.65);
-  return Math.max(1, dmg);
-}
-
-function calcEnemyDamage(enemy, target, formula=1.0) {
-  let atk = enemy.atk;
-  if (hasStatus(enemy, 'atkup')) atk = Math.floor(atk * 1.5);
-  if (hasStatus(enemy, 'atkdown')) atk = Math.floor(atk * 0.65);
   let dmg = Math.floor(atk * formula);
   if (hasStatus(target, 'dmgup')) dmg = Math.floor(dmg * 1.5);
   if (hasStatus(target, 'dmgdown')) dmg = Math.floor(dmg * 0.65);
@@ -2343,7 +2365,6 @@ function addLog(msg, type='') {
   entry.textContent = msg;
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight;
-  G.log.push(msg);
 }
 
 // ══════════════════════════════════════════
@@ -2773,11 +2794,11 @@ const CHAR_SUMMARIES = {
   ryan:      { summary: "High-damage frontliner who heals himself when he hits. Tight MP budget - pick your big swings carefully.", role: "Attacker / Self-sustain" },
   karishma:  { summary: "The squad's primary healer and only full-strength reviver. Hard to replace on Hard difficulty - protect her.", role: "Healer / Reviver" },
   sylvester: { summary: "Highest ATK in the roster. Pure burst damage with a stun and a debuff. Glass cannon - hits the hardest but needs support.", role: "Attacker / Control" },
-  janus:     { summary: "Tactical mage who debuffs enemies, buffs allies, and lands AOE nukes. Sets up teammates for big turns.", role: "Buffer / Debuffer / AOE" },
+  janus:     { summary: "Tactical mage who debuffs enemies, buffs the whole party, and lands AOE nukes. Revenue Games gives ATK Up to all officers at once — use it before a big offensive push.", role: "Buffer / Debuffer / AOE" },
   shaun:     { summary: "The squad's defensive anchor. Self-heals to stay alive, applies Damage Received Up to expose enemies, and shields the whole party with Tax Treaty. Slow but nearly impossible to kill.", role: "Tank / Party Shield" },
   arif:      { summary: "AOE controller who weakens the entire enemy formation. Publicity Campaign and Survey both hit all enemies, setting up President's Challenge drain for maximum recovery.", role: "AOE Debuffer / Drain" },
   bethany:   { summary: "AOE damage dealer who can also disrupt enemies and spot-heal allies. Fragile but versatile. Best in multi-enemy rotations.", role: "AOE / Utility" },
-  jiawei:    { summary: "Glass cannon who burns his own HP to hit harder. High risk, high reward. Keep him alive and he will carry rounds.", role: "Attacker / High-risk" },
+  jiawei:    { summary: "Glass cannon who pays HP to fight. Caffeine Overload costs a flat 20 HP — manageable early, dangerous late. Blood Donation revives a fallen ally for 70 HP of his own — heroic but potentially fatal. Push to Prod hits hardest of all but risks self-stun. Manage his health carefully.", role: "Attacker / High-risk / Reviver" },
   richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
   angel:     { summary: "The squad's MP battery who can also deal damage. Procurement Request keeps allies casting, Dinner and Dance patches the whole party, and Omelette Bomb deals damage while making enemies more vulnerable.", role: "Support / Attacker" },
   jasper:    { summary: "Stun-damage dealer who protects a key ally and revives fallen ones. Rejected by MOF hits hard with a stun, Violet Defence guards your most vulnerable officer, Undying Project pulls someone back from KO.", role: "Attacker / Support / Reviver" },
