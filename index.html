@@ -162,6 +162,11 @@
     color: #ff6060 !important;
   }
   .btn-hard:hover { background: #400000 !important; color: #ff8080 !important; }
+  .btn-normal {
+    border-color: #20a0c0 !important;
+    color: #60d0f0 !important;
+  }
+  .btn-normal:hover { background: #002030 !important; color: #80e0ff !important; }
   .diff-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
   /* ── SQUAD SELECT ── */
@@ -356,6 +361,8 @@
   .enemy-card.targetable { cursor: pointer; border-color: rgba(192,32,32,0.7); }
   .enemy-card.targetable:active { border-color: var(--gold); background: rgba(240,192,64,0.1); }
   .enemy-card.targeted { border-color: var(--gold); background: rgba(240,192,64,0.08); }
+  .enemy-card.acting { border-color: #ff4040; background: rgba(255,64,64,0.12); animation: enemyActing 0.3s steps(1) infinite; }
+  @keyframes enemyActing { 0%,49%{border-color:#ff4040;} 50%,100%{border-color:#ff8080;} }
   .enemy-card.dead { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .enemy-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #e08080; margin-bottom: 5px; line-height: 1.6; }
   .hp-bar-wrap { margin-bottom: 3px; }
@@ -482,6 +489,13 @@
   .action-btn .skill-mp { display: block; font-size: 6px; color: #4080ff; margin-top: 2px; }
   .action-btn .skill-desc { display: block; font-size: 5px; color: var(--text-dim); margin-top: 3px; line-height: 1.8; }
   .action-btn.basic { grid-column: span 3; min-height: 40px; }
+  .bonus-tag {
+    display: inline-block; margin-left: 4px;
+    background: #f0a000; color: #000;
+    font-size: 5px; padding: 1px 3px;
+    font-family: 'Press Start 2P', monospace;
+    vertical-align: middle;
+  }
 
   /* Targeting */
   .targeting-prompt {
@@ -712,6 +726,7 @@
     </div>
     <div class="diff-btns">
       <button class="btn btn-primary" onclick="selectDifficulty('easy')">⚔ EASY</button>
+      <button class="btn btn-primary btn-normal" onclick="selectDifficulty('normal')">★ NORMAL</button>
       <button class="btn btn-primary btn-hard" onclick="selectDifficulty('hard')">💀 HARD</button>
     </div>
   </div>
@@ -756,7 +771,10 @@
 <div id="battle-screen" class="screen">
   <div class="battle-header">
     <div class="rotation-label" id="battle-rotation-label">ROTATION 1</div>
-    <div class="turn-label" id="turn-label">Turn 1</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="turn-label" id="turn-label">Turn 1</div>
+      <button id="auto-btn" onclick="toggleAutoAdvance()" style="background:#000;border:1px solid var(--border);color:var(--text-dim);font-family:'Press Start 2P',monospace;font-size:5px;padding:4px 6px;cursor:pointer;" title="Toggle auto-advance enemy turns">AUTO: OFF</button>
+    </div>
   </div>
 
   <div class="turn-queue" id="turn-queue">
@@ -907,7 +925,7 @@ const CHARACTER_DATA = [
   {
     id:'bethany', name:'Bethany Su', role:'AI Lead',
     tags:['atk','util','heal'],
-    hp:230, mp:95, atk:60,
+    hp:260, mp:95, atk:60,
     skills:[
       {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
       {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.3, desc:'Damage + Attack Down + 30% Stun'},
@@ -919,9 +937,9 @@ const CHARACTER_DATA = [
     tags:['atk','util'],
     hp:220, mp:80, atk:90,
     skills:[
-      {name:'Caffeine Overload', mp:5, type:'dmg_self_dmg', target:'enemy', formula:1.5, selfHpPct:0.15, desc:'ATK×1.5 damage + lose 15% current HP'},
+      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:1.5, selfHpPct:0.15, desc:'ATK×1.5 damage + lose 15% current HP'},
       {name:'Deploy Hotfix', mp:15, type:'cleanse', target:'ally', desc:'Remove one debuff from one ally'},
-      {name:'Push to Prod', mp:20, type:'dmg_self_stun', target:'enemy', formula:2.0, selfStunChance:0.2, desc:'Heavy damage + 20% chance self Stun'},
+      {name:'Push to Prod', mp:20, type:'dmg_self_stun', target:'enemy', formula:2.0, selfStunChance:0.15, desc:'Heavy damage + 20% chance self Stun'},
     ]
   },
   {
@@ -960,7 +978,7 @@ const ENEMY_DATA = {
   minion: {name:'Minion', hp:120, atk:40, isBoss:false},
   sad: {name:'SAD', hp:220, atk:60, isBoss:false},
   director: {name:'Director', hp:300, atk:75, isBoss:false},
-  ceo: {name:'CEO', hp:750, atk:95, isBoss:true, stunImmune:true,
+  ceo: {name:'CEO', hp:700, atk:95, isBoss:true, stunImmune:true,
     skills:[
       {name:'Choose CM Sec', type:'debuff', effect:'atkdown', duration:3, target:'party_member'},
       {name:'Set Up Working Group', type:'buff', effect:'atkup', duration:3, target:'self'},
@@ -975,9 +993,14 @@ const ROTATION_CONFIG = {
     {enemies:['sad','director']},
     {enemies:['ceo','director']},
   ],
+  normal: [
+    {enemies:['minion','sad']},
+    {enemies:['sad','director']},
+    {enemies:['ceo','director']},
+  ],
   hard: [
     {enemies:['minion','sad']},
-    {enemies:['sad','director','director']},
+    {enemies:['sad','director']},
     {enemies:['ceo','director','sad']},
   ]
 };
@@ -990,8 +1013,8 @@ const STATUS_LABELS = {
   stun:{label:'STUN',cls:'si-stun'},
 };
 
-const DIFF_MULT = {easy:0.75, hard:1.25};
-const MP_RESTORE_BETWEEN = {easy:1.0, hard:0.5};
+const DIFF_MULT = {easy:0.75, normal:1.0, hard:1.1};
+const MP_RESTORE_BETWEEN = {easy:0.75, normal:0.65, hard:0.4};
 
 // ══════════════════════════════════════════
 // GAME STATE
@@ -1163,7 +1186,7 @@ function buildReorderSlots() {
         <div class="reorder-name">${ch.name}</div>
         <div class="reorder-role">${ch.role}${ch.ko ? ' [KO]':''}</div>
       </div>
-      <div style="margin-left:auto;font-size:11px;color:var(--text-dim)">${ch.hp}/${ch.maxHp} HP</div>
+      <div style="margin-left:auto;font-size:6px;font-family:'Press Start 2P',monospace;color:${ch.hp/ch.maxHp>0.6?'#40e060':ch.hp/ch.maxHp>0.3?'#f0a000':'#ff4040'}">${ch.hp}/${ch.maxHp}<br><span style="color:${ch.mp/ch.maxMp>0.4?'#4080ff':'#ff6060'}">${ch.mp}/${ch.maxMp} MP</span></div>
     `;
     slot.onclick = () => reorderTap(i);
     container.appendChild(slot);
@@ -1313,7 +1336,17 @@ function renderShane() {
     const onCd = cd > 0;
     btn.disabled = onCd || usedThisTurn || G.phase !== 'player';
     btn.classList.toggle('used-this-turn', usedThisTurn && !onCd);
-    cdEl.textContent = onCd ? `CD: ${cd}` : (usedThisTurn ? 'Used' : 'Ready');
+    // #13 Colour-coded cooldown: green=ready, amber=cd1, red=cd2+
+    if (onCd) {
+      cdEl.textContent = `CD: ${cd}`;
+      cdEl.style.color = cd === 1 ? '#f0a000' : '#ff4040';
+    } else if (usedThisTurn) {
+      cdEl.textContent = 'Used';
+      cdEl.style.color = '#606080';
+    } else {
+      cdEl.textContent = 'Ready';
+      cdEl.style.color = '#40e060';
+    }
   });
 }
 
@@ -1404,11 +1437,26 @@ function buildSkillButton(ch, sk, si, charIdx) {
   const noMp = ch.mp < sk.mp;
   const noTarget = checkSkillNoTarget(ch, sk, charIdx);
   const disabled = noMp || noTarget ? 'disabled' : '';
-  const reason = noMp ? `(Need ${sk.mp} MP)` : noTarget ? '(No valid target)' : `${sk.mp} MP`;
+  // #9 MP cost text colour — red when can't afford
+  const mpColour = noMp ? 'color:#ff4040' : 'color:#4080ff';
+  const reason = noMp ? `Need ${sk.mp} MP` : noTarget ? 'No valid target' : `${sk.mp} MP`;
+  // #9 Richmond bonus damage indicator
+  let bonusTag = '';
+  if (sk.type === 'dmg_bonus' && sk.bonusCondition) {
+    const aliveEnemies = G.enemies.filter(e => !e.dead);
+    const anyHasCond = aliveEnemies.some(e => hasStatus(e, sk.bonusCondition));
+    if (anyHasCond) bonusTag = '<span class="bonus-tag">BONUS ACTIVE</span>';
+  }
+  // #10 Arif drain: show living enemy count in desc
+  let desc = sk.desc;
+  if (sk.type === 'aoe_drain') {
+    const liveCount = G.enemies.filter(e=>!e.dead).length;
+    desc = sk.desc + ` [${liveCount} target${liveCount!==1?'s':''}]`;
+  }
   return `<button class="action-btn ${disabled}" onclick="useSkill(${charIdx},${si})" ${disabled}>
-    <span class="skill-name">${sk.name}</span>
-    <span class="skill-mp">${reason}</span>
-    <span class="skill-desc">${sk.desc}</span>
+    <span class="skill-name">${sk.name}${bonusTag}</span>
+    <span class="skill-mp" style="${mpColour}">${reason}</span>
+    <span class="skill-desc">${desc}</span>
   </button>`;
 }
 
@@ -1495,6 +1543,7 @@ function cancelTargeting() {
   clearTargetHighlights();
   document.getElementById('targeting-prompt').classList.remove('active');
   targetingState = null;
+  shaneTargetingState = null; // clear any stale Shane targeting state
   showActionPanel(G.currentActorIndex);
 }
 
@@ -1936,7 +1985,9 @@ function processNextEnemy() {
     dealDamageToParty(tIdx, dmg);
     floatNumber(dmg, 'party-card-'+tIdx, 'damage');
     actionText = `${en.name} attacks ${target.name} for ${dmg} damage!`;
+    highlightActiveEnemy(enIdx);
     showEnemyOverlay(en.name, actionText, () => {
+      clearEnemyHighlight();
       addLog(actionText, 'damage');
       tickStatuses(en);
       G.enemyQueueIndex++;
@@ -1949,7 +2000,9 @@ function processNextEnemy() {
     const target = targets[Math.floor(Math.random()*targets.length)];
     applyStatus(target, action.skill.effect, action.skill.duration);
     actionText = `CEO uses ${action.skill.name}! ${target.name} suffers ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
+    highlightActiveEnemy(enIdx);
     showEnemyOverlay('CEO', actionText, () => {
+      clearEnemyHighlight();
       addLog(actionText, 'debuff');
       tickStatuses(en);
       G.enemyQueueIndex++;
@@ -1958,7 +2011,9 @@ function processNextEnemy() {
   } else if (action.type === 'buff') {
     applyStatus(en, action.skill.effect, action.skill.duration);
     actionText = `CEO uses ${action.skill.name}! Gains ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
+    highlightActiveEnemy(enIdx);
     showEnemyOverlay('CEO', actionText, () => {
+      clearEnemyHighlight();
       addLog(actionText, 'buff');
       tickStatuses(en);
       G.enemyQueueIndex++;
@@ -1973,7 +2028,9 @@ function processNextEnemy() {
         hits.push({idx:i, dmg, name:p.name});
       }
     });
+    highlightActiveEnemy(enIdx);
     showEnemyOverlay('CEO', text + 'Imposing Double Hatting on all officers!', () => {
+      clearEnemyHighlight();
       hits.forEach(h => {
         dealDamageToParty(h.idx, h.dmg);
         floatNumber(h.dmg, 'party-card-'+h.idx, 'damage');
@@ -2076,7 +2133,15 @@ function applyStatus(entity, type, duration) {
   // Refresh duration (keep longer)
   const existing = entity.status.find(s => s.type === type);
   if (existing) {
+    const oldDur = existing.duration;
     existing.duration = Math.max(existing.duration, duration);
+    // #18 Log if a buff was refreshed (duration kept same or extended)
+    if (existing.duration >= oldDur && oldDur > 0) {
+      // Only log for party members (have 'id' field, not 'key')
+      if (entity.id && !entity.key) {
+        addLog(`${entity.name}'s ${STATUS_LABELS[type]?.label || type} refreshed (${existing.duration} turns).`, 'buff');
+      }
+    }
   } else {
     entity.status.push({type, duration});
   }
@@ -2154,11 +2219,7 @@ function rotationComplete() {
   G.rotationIndex++;
   const restoreRate = MP_RESTORE_BETWEEN[G.difficulty];
   G.party.forEach(ch => {
-    if (restoreRate === 1.0) {
-      ch.mp = ch.maxMp;
-    } else {
-      ch.mp = Math.min(ch.maxMp, ch.mp + Math.floor(ch.maxMp * restoreRate));
-    }
+    ch.mp = Math.min(ch.maxMp, ch.mp + Math.floor(ch.maxMp * restoreRate));
   });
   setTimeout(() => {
     G.rotationEnding = false;
@@ -2178,6 +2239,12 @@ function showEnemyOverlay(title, text, callback) {
   document.getElementById('overlay-text').textContent = text;
   document.getElementById('enemy-overlay').classList.add('active');
   renderBattle();
+  // #17 Auto-advance: dismiss after 1.5s if enabled
+  if (G_autoAdvance) {
+    setTimeout(() => {
+      if (overlayCallback) dismissEnemyOverlay();
+    }, 1500);
+  }
 }
 
 function dismissEnemyOverlay() {
@@ -2197,14 +2264,28 @@ function dismissEnemyOverlay() {
 function endGame(victory) {
   const title = document.getElementById('end-title');
   const sub = document.getElementById('end-sub');
+  const squadNames = G.party.map(p => p.name.split(' ')[0]).join(', ');
+  const survivors = G.party.filter(p => !p.ko).map(p => p.name.split(' ')[0]);
+  const survivorText = survivors.length > 0 ? `Survived: ${survivors.join(', ')}.` : 'No survivors.';
   if (victory) {
     title.textContent = 'VICTORY';
     title.className = 'end-title victory';
-    sub.textContent = `The CEO has been brought to justice. Shane's squad prevailed on ${G.difficulty.toUpperCase()} difficulty.`;
+    sub.innerHTML = `The CEO is brought to justice!<br><br>
+      <span style="font-size:6px;color:var(--text-dim)">
+        DIFFICULTY: ${G.difficulty.toUpperCase()}<br>
+        SQUAD: ${squadNames}<br>
+        TURNS: ${G.turn}<br>
+        ${survivorText}
+      </span>`;
   } else {
     title.textContent = 'MISSION FAILED';
     title.className = 'end-title defeat';
-    sub.textContent = `All officers are KO'd. The CEO escapes... for now. Try again with a different squad.`;
+    sub.innerHTML = `The CEO escapes... for now.<br><br>
+      <span style="font-size:6px;color:var(--text-dim)">
+        DIFFICULTY: ${G.difficulty.toUpperCase()}<br>
+        SQUAD: ${squadNames}<br>
+        TURNS: ${G.turn}
+      </span>`;
   }
   showScreen('end-screen');
 }
@@ -2729,6 +2810,40 @@ function showHelp() {
 
 function hideHelp() {
   document.getElementById('help-modal').classList.remove('active');
+}
+
+// ══════════════════════════════════════════
+// ENEMY HIGHLIGHT (#12)
+// ══════════════════════════════════════════
+
+function highlightActiveEnemy(idx) {
+  G.enemies.forEach((en, i) => {
+    const card = document.getElementById('enemy-card-' + i);
+    if (card) card.classList.toggle('acting', i === idx && !en.dead);
+  });
+}
+
+function clearEnemyHighlight() {
+  G.enemies.forEach((en, i) => {
+    const card = document.getElementById('enemy-card-' + i);
+    if (card) card.classList.remove('acting');
+  });
+}
+
+// ══════════════════════════════════════════
+// AUTO-ADVANCE ENEMY TURNS (#17)
+// ══════════════════════════════════════════
+
+let G_autoAdvance = false;
+
+function toggleAutoAdvance() {
+  G_autoAdvance = !G_autoAdvance;
+  const btn = document.getElementById('auto-btn');
+  if (btn) {
+    btn.textContent = 'AUTO: ' + (G_autoAdvance ? 'ON' : 'OFF');
+    btn.style.color = G_autoAdvance ? '#40e060' : 'var(--text-dim)';
+    btn.style.borderColor = G_autoAdvance ? '#40e060' : 'var(--border)';
+  }
 }
 </script>
 </body>
