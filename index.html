@@ -917,8 +917,8 @@ const CHARACTER_DATA = [
     tags:['debuff','atk'],
     hp:300, mp:80, atk:65,
     skills:[
-      {name:'Publicity Campaign', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:2, desc:'Attack Down on enemy for 2 turns'},
-      {name:'Survey', mp:15, type:'debuff', target:'enemy', effect:'dmgup', duration:2, desc:'Damage Received Up on enemy for 2 turns'},
+      {name:'Publicity Campaign', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'AOE Attack Down on all enemies for 2 turns'},
+      {name:'Survey', mp:15, type:'aoe_debuff', target:'enemies', effect:'dmgup', duration:2, desc:'AOE Damage Received Up on all enemies for 2 turns'},
       {name:"President's Challenge", mp:25, type:'aoe_drain', target:'enemies', formula:0.7, desc:'AOE HP drain; self recovers total drained'},
     ]
   },
@@ -964,11 +964,11 @@ const CHARACTER_DATA = [
   },
   {
     id:'jasper', name:'Jasper Samuel', role:'Seconded Officer',
-    tags:['atk','util','heal'],
+    tags:['atk','buff','heal'],
     hp:290, mp:80, atk:65,
     skills:[
       {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'Heavy damage (ATK×2.0) + Stun target 1 turn'},
-      {name:'Environmental Scanning', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage (ATK×0.8) to all enemies'},
+      {name:'Violet Defence', mp:20, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down to all party for 2 turns'},
       {name:'Undying Project', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
     ]
   },
@@ -1491,7 +1491,7 @@ function useSkill(charIdx, skillIdx) {
 
 function resolveSkillTargeting(charIdx, sk, skillIdx) {
   const t = sk.target || sk.type;
-  if (['aoe_dmg','aoe_heal','aoe_drain','enemies','party'].includes(t) || sk.type === 'aoe_drain') {
+  if (['aoe_dmg','aoe_heal','aoe_drain','aoe_buff','aoe_debuff','enemies','party'].includes(t) || sk.type === 'aoe_drain') {
     executeSkill(charIdx, skillIdx, null);
   } else if (sk.type === 'heal_self' || sk.type === 'dmg_self_dmg') {
     executeSkill(charIdx, skillIdx, charIdx);
@@ -1733,6 +1733,27 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     applyStatus(target, sk.effect1, sk.duration);
     applyStatus(target, sk.effect2, sk.duration);
     addLog(`${ch.name} uses ${sk.name} — ${target.name} gains ${STATUS_LABELS[sk.effect1]?.label} + ${STATUS_LABELS[sk.effect2]?.label}!`, 'buff');
+  }
+  else if (t === 'aoe_buff') {
+    let msg = `${ch.name} uses ${sk.name}!`;
+    G.party.forEach((p, i) => {
+      if (!p.ko) {
+        applyStatus(p, sk.effect, sk.duration);
+        floatNumber(STATUS_LABELS[sk.effect]?.label || sk.effect, 'party-card-'+i, 'heal');
+        msg += ` ${p.name.split(' ')[0]} gains ${STATUS_LABELS[sk.effect]?.label}.`;
+      }
+    });
+    addLog(msg, 'buff');
+  }
+  else if (t === 'aoe_debuff') {
+    let msg = `${ch.name} uses ${sk.name}!`;
+    G.enemies.forEach((en, i) => {
+      if (!en.dead) {
+        applyStatus(en, sk.effect, sk.duration);
+        msg += ` ${en.name} suffers ${STATUS_LABELS[sk.effect]?.label}.`;
+      }
+    });
+    addLog(msg, 'debuff');
   }
   else if (t === 'debuff') {
     const en = G.enemies[targetIdx];
@@ -2754,12 +2775,12 @@ const CHAR_SUMMARIES = {
   sylvester: { summary: "Highest ATK in the roster. Pure burst damage with a stun and a debuff. Glass cannon - hits the hardest but needs support.", role: "Attacker / Control" },
   janus:     { summary: "Tactical mage who debuffs enemies, buffs allies, and lands AOE nukes. Sets up teammates for big turns.", role: "Buffer / Debuffer / AOE" },
   shaun:     { summary: "Tankiest character. Heals himself, makes enemies vulnerable, and shields allies. Slow but nearly unkillable.", role: "Tank / Support" },
-  arif:      { summary: "Debuffer who weakens enemies then drains their HP in a big AOE. President's Challenge is devastating against multiple enemies.", role: "Debuffer / Drain" },
+  arif:      { summary: "AOE controller who weakens the entire enemy formation. Publicity Campaign and Survey both hit all enemies, setting up President's Challenge drain for maximum recovery.", role: "AOE Debuffer / Drain" },
   bethany:   { summary: "AOE damage dealer who can also disrupt enemies and spot-heal allies. Fragile but versatile. Best in multi-enemy rotations.", role: "AOE / Utility" },
   jiawei:    { summary: "Glass cannon who burns his own HP to hit harder. High risk, high reward. Keep him alive and he will carry rounds.", role: "Attacker / High-risk" },
   richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
   angel:     { summary: "The squad's MP battery. Restores resources, provides small heals, and can double-buff one ally. Essential on long fights.", role: "Support / Buffer" },
-  jasper:    { summary: "Stun-damage dealer with AOE capability and a backup revive. Hits hard, disrupts enemies, and covers your team if the main healer falls.", role: "Attacker / AOE / Reviver" },
+  jasper:    { summary: "Stun-damage dealer who shields the whole party and can revive fallen allies. Rejected by MOF stuns hard, Violet Defence protects everyone, Undying Project brings them back.", role: "Attacker / Party Shield / Reviver" },
 };
 
 function buildHelpContent() {
