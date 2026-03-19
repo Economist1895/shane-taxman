@@ -964,12 +964,12 @@ const CHARACTER_DATA = [
   },
   {
     id:'jasper', name:'Jasper Samuel', role:'Seconded Officer',
-    tags:['debuff','atk','heal'],
+    tags:['atk','util','heal'],
     hp:290, mp:80, atk:65,
     skills:[
-      {name:'Rejected by MOF', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:2, desc:'Attack Down on enemy for 2 turns'},
-      {name:'Environmental Scanning', mp:20, type:'dmg_strip', target:'enemy', formula:2.0, desc:'Heavy damage + strip one buff from target'},
-      {name:'Recall from Secondment', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
+      {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'Heavy damage (ATK×2.0) + Stun target 1 turn'},
+      {name:'Environmental Scanning', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage (ATK×0.8) to all enemies'},
+      {name:'Undying Project', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
     ]
   },
 ];
@@ -2759,7 +2759,7 @@ const CHAR_SUMMARIES = {
   jiawei:    { summary: "Glass cannon who burns his own HP to hit harder. High risk, high reward. Keep him alive and he will carry rounds.", role: "Attacker / High-risk" },
   richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
   angel:     { summary: "The squad's MP battery. Restores resources, provides small heals, and can double-buff one ally. Essential on long fights.", role: "Support / Buffer" },
-  jasper:    { summary: "Seconded officer who strips enemy buffs, deals solid damage, and serves as a backup reviver. Flexible wildcard pick.", role: "Debuffer / Reviver" },
+  jasper:    { summary: "Stun-damage dealer with AOE capability and a backup revive. Hits hard, disrupts enemies, and covers your team if the main healer falls.", role: "Attacker / AOE / Reviver" },
 };
 
 function buildHelpContent() {
