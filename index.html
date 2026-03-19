@@ -356,12 +356,12 @@
   .enemy-card.targetable { cursor: pointer; border-color: rgba(192,32,32,0.7); }
   .enemy-card.targetable:active { border-color: var(--gold); background: rgba(240,192,64,0.1); }
   .enemy-card.targeted { border-color: var(--gold); background: rgba(240,192,64,0.08); }
-  .enemy-card.dead { opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+  .enemy-card.dead { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .enemy-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: #e08080; margin-bottom: 5px; line-height: 1.6; }
   .hp-bar-wrap { margin-bottom: 3px; }
   .bar-label { font-size: 6px; color: var(--text-dim); margin-bottom: 2px; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; }
   .bar-outer { height: 8px; background: #000; border: 1px solid var(--border); position: relative; }
-  .bar-inner { height: 100%; transition: width 0.3s steps(8); image-rendering: pixelated; }
+  .bar-inner { height: 100%; transition: width 0.15s steps(4); image-rendering: pixelated; }
   .bar-hp { background: var(--hp); }
   .bar-hp.low { background: var(--hp-low); animation: hpPulse 0.5s steps(1) infinite; }
   @keyframes hpPulse { 0%,49%{opacity:1} 50%,100%{opacity:0.5} }
@@ -570,7 +570,7 @@
     font-family: 'Press Start 2P', monospace;
     font-size: 14px; font-weight: 900;
     pointer-events: none; z-index: 200;
-    animation: floatUp 1s steps(8) forwards;
+    animation: floatUp 0.7s steps(6) forwards;
     text-shadow: 2px 2px 0 #000;
   }
   .dmg-float.damage { color: #ff4040; }
@@ -591,7 +591,7 @@
     padding: 10px 16px;
     z-index: 300; display: none;
     text-align: center; max-width: 260px; line-height: 2;
-    animation: notifFade 2.5s steps(1) forwards;
+    animation: notifFade 2s steps(1) forwards;
     box-shadow: 4px 4px 0 #000;
   }
   @keyframes notifFade {
@@ -915,7 +915,7 @@ const CHARACTER_DATA = [
     ]
   },
   {
-    id:'jiawei', name:'Jia Wei Tan', role:'Software Developer',
+    id:'jiawei', name:'Jiawei Tan', role:'Software Developer',
     tags:['atk','util'],
     hp:220, mp:80, atk:90,
     skills:[
@@ -1374,7 +1374,7 @@ function advanceToNextActor() {
     G.actionsThisTurn.push(found);
     addLog(`${ch.name} is Stunned and loses their turn!`, 'debuff');
     renderBattle();
-    setTimeout(() => advanceToNextActor(), 800);
+    setTimeout(() => advanceToNextActor(), 400);
     return;
   }
   G.currentActorIndex = found;
@@ -1814,7 +1814,7 @@ function markActed(charIdx) {
     checkRotationEnd();
     return;
   }
-  setTimeout(() => advanceToNextActor(), 300);
+  setTimeout(() => advanceToNextActor(), 150);
 }
 
 // ══════════════════════════════════════════
@@ -2125,13 +2125,13 @@ function dealDamageToParty(idx, dmg) {
 
 function checkRotationEnd() {
   if (G.enemies.every(e => e.dead)) {
-    setTimeout(() => rotationComplete(), 600);
+    setTimeout(() => rotationComplete(), 300);
   }
 }
 
 function checkWipe() {
   if (G.party.every(p => p.ko)) {
-    setTimeout(() => endGame(false), 500);
+    setTimeout(() => endGame(false), 250);
   }
 }
 
@@ -2148,7 +2148,7 @@ function rotationComplete() {
   G.rotationEnding = true;
   addLog(`— Rotation complete! —`, 'system');
   if (G.rotationIndex >= 2) {
-    setTimeout(() => endGame(true), 800);
+    setTimeout(() => endGame(true), 400);
     return;
   }
   G.rotationIndex++;
@@ -2163,7 +2163,7 @@ function rotationComplete() {
   setTimeout(() => {
     G.rotationEnding = false;
     showReorderScreen();
-  }, 600);
+  }, 300);
 }
 
 // ══════════════════════════════════════════
@@ -2227,7 +2227,7 @@ function floatNumber(val, targetId, type) {
   div.style.left = (rect.left + rect.width/2 - 20) + 'px';
   div.style.top = (rect.top + rect.height/2) + 'px';
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 1300);
+  setTimeout(() => div.remove(), 900);
 }
 
 // ══════════════════════════════════════════
@@ -2254,8 +2254,8 @@ function showNotif(msg) {
   el.style.display = 'block';
   el.style.animation = 'none';
   void el.offsetWidth;
-  el.style.animation = 'notifFade 2.5s ease-out forwards';
-  setTimeout(() => { el.style.display = 'none'; }, 2600);
+  el.style.animation = 'notifFade 2s ease-out forwards';
+  setTimeout(() => { el.style.display = 'none'; }, 2100);
 }
 
 // ══════════════════════════════════════════
@@ -2446,7 +2446,7 @@ const SPRITES = {
     '_KK____KK___',
     'KK______KK__',
   ],
-  jiawei: [ // Jia Wei - dev, hoodie, messy hair
+  jiawei: [ // Jiawei - dev, hoodie, messy hair
     '____KKKK____',
     '___KhHhK____',
     '__KhHhHhK___',
