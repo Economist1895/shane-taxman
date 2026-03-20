@@ -722,7 +722,7 @@
     <div class="title-logo">SHANE THE TAXMAN</div>
     <div class="title-start-map">— START MAP —</div>
     <div class="title-desc">
-      Shane Ong commands his squad through 3 Rotations of bureaucratic combat.<br>Deploy your best officers. Collect every penalty.
+      Shane Ong manages his squad through 3 Rotations of bureaucratic combat.<br>Deploy your best officers. Collect every penalty.
     </div>
     <div class="diff-btns">
       <button class="btn btn-primary" onclick="selectDifficulty('easy')">⚔ EASY</button>
@@ -791,12 +791,12 @@
     <div class="shane-label">SHANE</div>
     <div class="shane-skills">
       <button class="shane-skill-btn" id="shane-btn-0" onclick="shaneSkill(0)">
-        "Do Work!"
+        Assign Work
         <span class="cd-text" id="shane-cd-0">Ready</span>
         <span class="shane-skill-desc">ATK↑ one ally for 2 turns · CD 3</span>
       </button>
       <button class="shane-skill-btn" id="shane-btn-1" onclick="shaneSkill(1)">
-        Organise Party
+        Plan JB Trip
         <span class="cd-text" id="shane-cd-1">Ready</span>
         <span class="shane-skill-desc">Restore 20 MP to all party · CD 4</span>
       </button>
@@ -901,7 +901,7 @@ const CHARACTER_DATA = [
     tags:['debuff','buff','atk'],
     hp:290, mp:85, atk:71,
     skills:[
-      {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:2, desc:'Attack Down on enemy for 2 turns'},
+      {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on enemy for 3 turns'},
       {name:'Public Consultation', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
       {name:'Revenue Games', mp:20, type:'aoe_buff', target:'party', effect:'atkup', duration:3, desc:'Attack Up on all party members for 3 turns'},
     ]
@@ -1331,8 +1331,8 @@ function renderParty() {
 
 function renderShane() {
   const shaneDefs = [
-    {name:'"Do Work!"', cd:3},
-    {name:'Organise Party', cd:4},
+    {name:'Assign Work', cd:3},
+    {name:'Plan JB Trip', cd:4},
   ];
   shaneDefs.forEach((s,i) => {
     const btn = document.getElementById('shane-btn-'+i);
@@ -1907,10 +1907,10 @@ function markActed(charIdx) {
 function shaneSkill(idx) {
   if (G.shaneCooldowns[idx] > 0 || G.shaneUsedThisTurn || G.phase !== 'player') return;
   if (idx === 0) {
-    // Do Work! — target ally
+    // Assign Work — target ally
     startShaneTargeting(idx, 'ally');
   } else {
-    // Organise Party — AOE MP restore
+    // Plan JB Trip — AOE MP restore
     executeShaneSkill(idx, null);
   }
 }
@@ -1920,7 +1920,7 @@ let shaneTargetingState = null;
 function startShaneTargeting(idx, targetType) {
   shaneTargetingState = {idx, targetType};
   const prompt = document.getElementById('targeting-prompt');
-  document.getElementById('targeting-text').textContent = 'Shane: Select an ally for "Do Work!"';
+  document.getElementById('targeting-text').textContent = 'Shane: Select an ally for Assign Work';
   prompt.classList.add('active');
   G.party.forEach((ch, i) => {
     const card = document.getElementById('party-card-'+i);
@@ -1944,11 +1944,11 @@ function executeShaneSkill(idx, targetIdx) {
   if (idx === 0) {
     const target = G.party[targetIdx];
     applyStatus(target, 'atkup', 2);
-    addLog(`Shane: "Do Work!" — ${target.name} gains Attack Up for 2 turns!`, 'buff');
+    addLog(`Shane: Assign Work — ${target.name} gains Attack Up for 2 turns!`, 'buff');
     floatNumber('ATK↑', 'party-card-'+targetIdx, 'heal');
     G.shaneCooldowns[0] = 3;
   } else {
-    let msg = 'Shane: Organise Party! ';
+    let msg = 'Shane: Plan JB Trip! ';
     G.party.forEach((p, i) => {
       if (!p.ko) {
         const restored = Math.min(20, p.maxMp - p.mp);
@@ -2314,7 +2314,7 @@ function endGame(victory) {
   if (victory) {
     title.textContent = 'VICTORY';
     title.className = 'end-title victory';
-    sub.innerHTML = `The CEO is brought to justice!<br><br>
+    sub.innerHTML = `Amazing - PG 5 for you.<br><br>
       <span style="font-size:6px;color:var(--text-dim)">
         DIFFICULTY: ${G.difficulty.toUpperCase()}<br>
         SQUAD: ${squadNames}<br>
@@ -2445,7 +2445,7 @@ const PALETTE = {
 // 12 wide x 16 tall sprites
 // Format: array of 16 strings, each 12 chars (palette key)
 const SPRITES = {
-  shane: [ // Shane - commander in gold suit
+  shane: [ // Shane - manager in gold suit
     '____KKKK____',
     '___KSSKK____',
     '___KSSK_____',
@@ -2831,15 +2831,15 @@ function buildHelpContent() {
   let html = '';
 
   // Intro
-  html += '<div class="help-intro">Shane Ong commands from the sidelines. Pick 3 officers to fight. Each officer has a free Basic Attack and 3 skills that cost MP. Shane has 2 command skills usable anytime during your turn, each on a cooldown.</div>';
+  html += '<div class="help-intro">Shane Ong manages from the sidelines. Pick 3 officers to fight. Each officer has a free Basic Attack and 3 skills that cost MP. Shane has 2 manager skills usable anytime during your turn, each on a cooldown.</div>';
 
   // Shane section
-  html += '<div class="help-section-title">Shane Ong — Commander</div>';
+  html += '<div class="help-section-title">Shane Ong — Manager</div>';
   html += '<div class="help-char-entry">';
   html += '<div class="help-char-summary">Does not fight directly. Issues commands at any point during your turn.</div>';
   html += '<ul class="help-skill-list">';
-  html += '<li class="help-skill-item"><span class="help-skill-name">"Do Work!" (CD: 3)</span> — ATK Up on one ally for 2 turns. Best used just before your strongest attacker acts.</li>';
-  html += '<li class="help-skill-item"><span class="help-skill-name">Organise Party (CD: 4)</span> — Restore 20 MP to all 3 officers. Save for when skills are running dry.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">Assign Work (CD: 3)</span> — ATK Up on one ally for 2 turns. Best used just before your strongest attacker acts.</li>';
+  html += '<li class="help-skill-item"><span class="help-skill-name">Plan JB Trip (CD: 4)</span> — Restore 20 MP to all 3 officers. Save for when skills are running dry.</li>';
   html += '</ul></div>';
 
   // Officers
