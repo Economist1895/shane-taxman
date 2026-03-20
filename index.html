@@ -891,10 +891,10 @@ const CHARACTER_DATA = [
   {
     id:'bethany', name:'Bethany Su', role:'AI Lead',
     tags:['atk','debuff','heal'],
-    hp:260, mp:95, atk:71,
+    hp:260, mp:95, atk:75,
     skills:[
       {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
-      {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.3, desc:'ATK×1.5 damage + Attack Down (2 turns) + 30% chance Stun'},
+      {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.45, desc:'ATK×1.5 damage + Attack Down (2 turns) + 45% chance Stun'},
       {name:'Make Pasta', mp:10, type:'heal', target:'ally', amount:90, desc:'Heal one ally (90 HP)'},
     ]
   },
@@ -905,7 +905,7 @@ const CHARACTER_DATA = [
     skills:[
       {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:2.0, selfHpFlat:30, desc:'ATK×2.0 damage; lose 30 HP (can be fatal)'},
       {name:'Blood Donation', mp:15, type:'revive_self_dmg', target:'ally_ko', selfHpFlat:70, revivePct:0.38, desc:'Lose 70 HP to revive a KO\'d ally at 38% HP (can be fatal)'},
-      {name:'Dessert for Dinner', mp:15, type:'heal_self', target:'self', amount:65, desc:'Heal self (65 HP)'},
+      {name:'Dessert for Dinner', mp:15, type:'heal_self', target:'self', amount:80, desc:'Heal self (80 HP)'},
     ]
   },
   {
@@ -2740,8 +2740,8 @@ const CHAR_SUMMARIES = {
   janus:     { summary: "Sets up the whole party for big turns. Policy Review weakens enemies cheaply, Revenue Games gives ATK Up to all officers at once, and Public Consultation clears out weaker enemies. Best used before your attackers act.", role: "Debuffer / Buffer / AOE Attacker" },
   shaun:     { summary: "The squad's defensive anchor — nearly impossible to kill. Input Tax keeps him healthy, Output Tax weakens enemies with Attack Down, and Tax Treaty reduces damage taken by the whole party. Slow to deal damage but invaluable on Hard.", role: "Tank / Debuffer" },
   arif:      { summary: "Weakens the entire enemy formation with two AOE debuffs. Publicity Campaign lowers enemy ATK, Survey raises damage they take, then President's Challenge drains their HP and heals Arif for the total. Scales with enemy count — strongest in Waves 2 and 3.", role: "AOE Debuffer / Drain" },
-  bethany:   { summary: "Flexible officer who covers AOE damage, disruption, and spot healing in one slot. Hack applies Attack Down and has a 30% stun chance. Deploy Bot hits all enemies. Make Pasta patches up a wounded ally. Best when facing multiple enemies.", role: "AOE Attacker / Debuffer / Healer" },
-  jiawei:    { summary: "Manages his own HP as a second resource. Caffeine Overload deals strong damage but costs 30 HP per cast — Dessert for Dinner patches him back up. Blood Donation revives a fallen ally at the cost of his own HP. Keep the cycle going and he carries fights.", role: "Attacker / Self-sustain / Reviver" },
+  bethany:   { summary: "Flexible officer who covers AOE damage, disruption, and spot healing in one slot. Hack applies Attack Down and has a 45% stun chance — the most reliable disruptor in the roster. Deploy Bot hits all enemies. Make Pasta patches up a wounded ally. Best when facing multiple enemies.", role: "AOE Attacker / Debuffer / Healer" },
+  jiawei:    { summary: "Manages his own HP as a second resource. Caffeine Overload deals strong damage but costs 30 HP per cast — Dessert for Dinner patches him back up (80 HP). Blood Donation revives a fallen ally at the cost of his own HP. Keep the cycle going and he carries fights.", role: "Attacker / Self-sustain / Reviver" },
   richmond:  { summary: "Deals bonus damage when enemies are set up correctly. Apply Audit Finding first, then Impose Penalty hits at ATK×2.5 instead of ×2.0. Tax Recovery sustains him between setups. Rewards planning over brute force.", role: "Attacker / Debuffer" },
   angel:     { summary: "Keeps the whole party resourced and fighting. Procurement Request restores 25 MP to any ally for just 10 MP — the best MP efficiency in the game. Dinner & Dance patches the whole party cheaply, and Omelette Bomb deals damage while setting up bigger hits.", role: "Support / Attacker" },
   jasper:    { summary: "Disrupts enemies and protects allies while contributing solid damage. Rejected by MOF hits hard and stuns. Violet Defence shields your most vulnerable officer. Undying Project brings back a fallen ally when you need a second chance.", role: "Attacker / Support / Reviver" },
