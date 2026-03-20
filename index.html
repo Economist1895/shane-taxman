@@ -864,7 +864,7 @@ const CHARACTER_DATA = [
     hp:290, mp:85, atk:71,
     skills:[
       {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on one enemy (3 turns)'},
-      {name:'Public Consultation', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
+      {name:'Legislative Amendment', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
       {name:'Revenue Games', mp:20, type:'aoe_buff', target:'party', effect:'atkup', duration:3, desc:'Attack Up on all party members (3 turns)'},
     ]
   },
@@ -873,9 +873,9 @@ const CHARACTER_DATA = [
     tags:['tank','debuff'],
     hp:380, mp:65, atk:60,
     skills:[
-      {name:'Input Tax', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self (100 HP)'},
-      {name:'Output Tax', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'atkdown', duration:3, desc:'ATK×1.5 damage + Attack Down on target (3 turns)'},
-      {name:'Tax Treaty', mp:15, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down on all party (2 turns)'},
+      {name:'Sipping Tea', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self (100 HP)'},
+      {name:'Panda Storm', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'atkdown', duration:3, desc:'ATK×1.5 damage + Attack Down on target (3 turns)'},
+      {name:'Top Staffer', mp:15, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down on all party (2 turns)'},
     ]
   },
   {
@@ -883,8 +883,8 @@ const CHARACTER_DATA = [
     tags:['debuff','atk'],
     hp:300, mp:80, atk:65,
     skills:[
-      {name:'Publicity Campaign', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'Attack Down on all enemies (2 turns)'},
-      {name:'Survey', mp:15, type:'aoe_debuff', target:'enemies', effect:'dmgup', duration:2, desc:'Damage Received Up on all enemies (2 turns)'},
+      {name:'Dazzling Infographics', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'Attack Down on all enemies (2 turns)'},
+      {name:'Data Analysis', mp:15, type:'aoe_debuff', target:'enemies', effect:'dmgup', duration:2, desc:'Damage Received Up on all enemies (2 turns)'},
       {name:"President's Challenge", mp:25, type:'aoe_drain', target:'enemies', formula:0.7, desc:'ATK×0.7 drain on all enemies; self recovers total HP drained'},
     ]
   },
@@ -934,7 +934,7 @@ const CHARACTER_DATA = [
     hp:290, mp:80, atk:65,
     skills:[
       {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'ATK×2.0 damage + Stun target (1 turn)'},
-      {name:'Violet Defence', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally (2 turns)'},
+      {name:'Ultraviolet Protection', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally (2 turns)'},
       {name:'Undying Project', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
     ]
   },
@@ -2737,14 +2737,14 @@ const CHAR_SUMMARIES = {
   ryan:      { summary: "Hard-hitting attacker who heals himself on every hit. Tax Recovery makes him self-sufficient, and Tax Mobile of Justice adds disruption when needed. Tight MP pool — spend it on the right moments.", role: "Attacker / Self-sustain" },
   karishma:  { summary: "The squad's primary healer with the strongest revive in the roster. Hard to replace on Hard difficulty — if she goes down, recovery becomes very difficult. Keep her protected.", role: "Healer / Reviver" },
   sylvester: { summary: "Highest ATK in the roster — hits harder than anyone else. Legal Injunction applies a long-lasting Attack Down cheaply, while Summon to Court adds a stun. No self-sustain, so he needs support to stay in the fight.", role: "Attacker / Control" },
-  janus:     { summary: "Sets up the whole party for big turns. Policy Review weakens enemies cheaply, Revenue Games gives ATK Up to all officers at once, and Public Consultation clears out weaker enemies. Best used before your attackers act.", role: "Debuffer / Buffer / AOE Attacker" },
-  shaun:     { summary: "The squad's defensive anchor — nearly impossible to kill. Input Tax keeps him healthy, Output Tax weakens enemies with Attack Down, and Tax Treaty reduces damage taken by the whole party. Slow to deal damage but invaluable on Hard.", role: "Tank / Debuffer" },
-  arif:      { summary: "Weakens the entire enemy formation with two AOE debuffs. Publicity Campaign lowers enemy ATK, Survey raises damage they take, then President's Challenge drains their HP and heals Arif for the total. Scales with enemy count — strongest in Waves 2 and 3.", role: "AOE Debuffer / Drain" },
+  janus:     { summary: "Sets up the whole party for big turns. Policy Review weakens enemies cheaply, Revenue Games gives ATK Up to all officers at once, and Legislative Amendment clears out weaker enemies. Best used before your attackers act.", role: "Debuffer / Buffer / AOE Attacker" },
+  shaun:     { summary: "The squad's defensive anchor — nearly impossible to kill. Sipping Tea keeps him healthy, Panda Storm weakens enemies with Attack Down, and Top Staffer reduces damage taken by the whole party. Slow to deal damage but invaluable on Hard.", role: "Tank / Debuffer" },
+  arif:      { summary: "Weakens the entire enemy formation with two AOE debuffs. Dazzling Infographics lowers enemy ATK, Data Analysis raises damage they take, then President's Challenge drains their HP and heals Arif for the total. Scales with enemy count — strongest in Waves 2 and 3.", role: "AOE Debuffer / Drain" },
   bethany:   { summary: "Flexible officer who covers AOE damage, disruption, and spot healing in one slot. Hack applies Attack Down and has a 45% stun chance — the most reliable disruptor in the roster. Deploy Bot hits all enemies. Make Pasta patches up a wounded ally. Best when facing multiple enemies.", role: "AOE Attacker / Debuffer / Healer" },
   jiawei:    { summary: "Manages his own HP as a second resource. Caffeine Overload deals strong damage but costs 30 HP per cast — Dessert for Dinner patches him back up (80 HP). Blood Donation revives a fallen ally at the cost of his own HP. Keep the cycle going and he carries fights.", role: "Attacker / Self-sustain / Reviver" },
   richmond:  { summary: "Deals bonus damage when enemies are set up correctly. Apply Audit Finding first, then Impose Penalty hits at ATK×2.5 instead of ×2.0. Tax Recovery sustains him between setups. Rewards planning over brute force.", role: "Attacker / Debuffer" },
   angel:     { summary: "Keeps the whole party resourced and fighting. Procurement Request restores 25 MP to any ally for just 10 MP — the best MP efficiency in the game. Dinner & Dance patches the whole party cheaply, and Omelette Bomb deals damage while setting up bigger hits.", role: "Support / Attacker" },
-  jasper:    { summary: "Disrupts enemies and protects allies while contributing solid damage. Rejected by MOF hits hard and stuns. Violet Defence shields your most vulnerable officer. Undying Project brings back a fallen ally when you need a second chance.", role: "Attacker / Support / Reviver" },
+  jasper:    { summary: "Disrupts enemies and protects allies while contributing solid damage. Rejected by MOF hits hard and stuns. Ultraviolet Protection shields your most vulnerable officer. Undying Project brings back a fallen ally when you need a second chance.", role: "Attacker / Support / Reviver" },
 };
 
 function buildHelpContent() {
