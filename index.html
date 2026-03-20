@@ -26,6 +26,7 @@
     --dmg-down: #20a0a0;
     --stun: #c020c0;
     --enemy-col: #e02020;
+    --fs: clamp(8px, 1.9vw, 11px);
   }
 
   @font-face {
@@ -41,7 +42,7 @@
     font-family: 'Press Start 2P', monospace;
     min-height: 100vh;
     overflow-x: hidden;
-    font-size: 9px;
+    font-size: var(--fs);
     image-rendering: pixelated;
     /* CRT scanline overlay */
     background-image: repeating-linear-gradient(
@@ -104,7 +105,7 @@
   }
   .title-start-map {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(7px, 2vw, 10px);
+    font-size: var(--fs);
     color: var(--text-dim);
     letter-spacing: 0.2em;
     margin-bottom: 14px;
@@ -115,7 +116,7 @@
     50%, 100% { opacity: 0.4; }
   }
   .title-desc {
-    font-size: 7px; color: var(--text-dim);
+    font-size: var(--fs); color: var(--text-dim);
     line-height: 2; max-width: 300px; margin-bottom: 24px;
   }
   .diff-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
@@ -127,7 +128,7 @@
     outline: 1px solid #000;
     color: var(--gold-light);
     font-family: 'Press Start 2P', monospace;
-    font-size: 8px;
+    font-size: calc(var(--fs) * 1.1);
     letter-spacing: 0.1em;
     padding: 12px 20px;
     cursor: pointer;
@@ -154,7 +155,7 @@
   .btn-primary {
     background: #000;
     border: 3px solid var(--gold);
-    font-size: 9px;
+    font-size: calc(var(--fs) * 1.2);
     padding: 14px 24px;
   }
   .btn-hard {
@@ -179,12 +180,12 @@
   }
   .screen-title {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(8px, 2.5vw, 11px);
+    font-size: calc(var(--fs) * 1.1);
     color: var(--gold);
     letter-spacing: 0.1em;
     line-height: 1.8;
   }
-  .screen-sub { font-size: 8px; color: var(--text-dim); margin-top: 6px; }
+  .screen-sub { font-size: calc(var(--fs) * 1.1); color: var(--text-dim); margin-top: 6px; }
 
   .squad-slots {
     display: flex; gap: 6px; padding: 10px 12px;
@@ -193,10 +194,10 @@
     justify-content: center;
   }
   .squad-slot {
-    width: 80px; height: 60px;
+    width: clamp(80px, 18vw, 120px); height: clamp(60px, 12vw, 80px);
     border: 2px dashed var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 8px; color: var(--text-dim);
+    font-size: calc(var(--fs) * 1.1); color: var(--text-dim);
     text-align: center; padding: 4px;
     font-family: 'Press Start 2P', monospace;
     position: relative;
@@ -206,12 +207,12 @@
   .squad-slot.filled {
     border: 2px solid var(--gold-dark);
     background: rgba(240,192,64,0.08);
-    font-size: 8px; color: var(--text);
+    font-size: calc(var(--fs) * 1.1); color: var(--text);
   }
   .squad-slot.filled:hover { border-color: var(--gold); }
   .slot-num {
     position: absolute; top: 2px; left: 4px;
-    font-size: 7px; color: var(--gold-dark);
+    font-size: var(--fs); color: var(--gold-dark);
     font-family: 'Press Start 2P', monospace;
   }
 
@@ -235,11 +236,11 @@
   .char-card:active { background: rgba(240,192,64,0.06); }
   .char-card.selected { border-color: var(--gold); background: rgba(240,192,64,0.1); }
   .char-card.disabled { opacity: 0.3; cursor: not-allowed; }
-  .char-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--gold-light); margin-bottom: 4px; line-height: 1.8; }
-  .char-role { font-size: 7px; color: var(--text-dim); margin-bottom: 6px; line-height: 1.6; }
+  .char-name { font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1); color: var(--gold-light); margin-bottom: 4px; line-height: 1.8; }
+  .char-role { font-size: var(--fs); color: var(--text-dim); margin-bottom: 6px; line-height: 1.6; }
   .char-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 6px; }
   .tag {
-    font-size: 7px; padding: 2px 4px;
+    font-size: var(--fs); padding: 2px 4px;
     border: 1px solid;
     font-family: 'Press Start 2P', monospace;
     text-transform: uppercase;
@@ -250,7 +251,7 @@
   .tag-debuff { border-color: #4040c0; color: #4040c0; }
   .tag-tank { border-color: #2060e0; color: #2060e0; }
   .tag-util { border-color: #a040c0; color: #a040c0; }
-  .mini-stats { display: flex; gap: 4px; font-size: 7px; flex-wrap: wrap; }
+  .mini-stats { display: flex; gap: 4px; font-size: var(--fs); flex-wrap: wrap; }
   .mini-stat { display: flex; align-items: center; gap: 2px; }
   .mini-stat span { color: var(--text-dim); }
 
@@ -263,7 +264,7 @@
     border: 2px solid var(--text-dim);
     color: var(--text-dim);
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px;
+    font-size: var(--fs);
     padding: 6px 10px; cursor: pointer;
     box-shadow: 2px 2px 0 #000;
     -webkit-tap-highlight-color: transparent;
@@ -287,9 +288,9 @@
     font-family: 'Press Start 2P', monospace; font-size: 14px;
     color: var(--gold-dark); width: 20px; text-align: center; flex-shrink: 0;
   }
-  .reorder-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--gold-light); line-height: 1.6; }
-  .reorder-role { font-size: 6px; color: var(--text-dim); margin-top: 3px; line-height: 1.6; }
-  .drag-hint { font-size: 7px; color: var(--text-dim); text-align: center; padding: 8px; line-height: 2; }
+  .reorder-name { font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1); color: var(--gold-light); line-height: 1.6; }
+  .reorder-role { font-size: calc(var(--fs) * 0.85); color: var(--text-dim); margin-top: 3px; line-height: 1.6; }
+  .drag-hint { font-size: var(--fs); color: var(--text-dim); text-align: center; padding: 8px; line-height: 2; }
   .enemy-preview {
     background: rgba(192,32,32,0.1);
     border: 2px solid rgba(192,32,32,0.4);
@@ -297,14 +298,14 @@
     padding: 10px;
   }
   .enemy-preview-title {
-    font-family: 'Press Start 2P', monospace; font-size: 7px;
+    font-family: 'Press Start 2P', monospace; font-size: var(--fs);
     color: var(--enemy-col); letter-spacing: 0.1em; margin-bottom: 8px;
   }
   .enemy-preview-list { display: flex; gap: 6px; flex-wrap: wrap; }
   .enemy-chip {
     background: rgba(192,32,32,0.15);
     border: 2px solid rgba(192,32,32,0.5);
-    padding: 4px 8px; font-size: 7px; color: #e08080;
+    padding: 4px 8px; font-size: var(--fs); color: #e08080;
     font-family: 'Press Start 2P', monospace;
   }
 
@@ -318,10 +319,10 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .rotation-label {
-    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1);
     color: var(--gold); letter-spacing: 0.08em;
   }
-  .turn-label { font-size: 7px; color: var(--text-dim); }
+  .turn-label { font-size: var(--fs); color: var(--text-dim); }
 
   /* Turn queue */
   .turn-queue {
@@ -332,10 +333,10 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .queue-label { font-size: 7px; color: var(--text-dim); flex-shrink: 0; font-family: 'Press Start 2P', monospace; }
+  .queue-label { font-size: var(--fs); color: var(--text-dim); flex-shrink: 0; font-family: 'Press Start 2P', monospace; }
   .queue-item {
     flex-shrink: 0; padding: 4px 7px;
-    font-size: 7px; font-family: 'Press Start 2P', monospace;
+    font-size: var(--fs); font-family: 'Press Start 2P', monospace;
     border: 1px solid var(--border);
     white-space: nowrap;
   }
@@ -354,7 +355,7 @@
     background: var(--panel);
     border: 2px solid rgba(192,32,32,0.4);
     padding: 8px 10px;
-    min-width: 80px; max-width: 110px;
+    min-width: 100px; max-width: 160px;
     flex: 1;
     position: relative;
   }
@@ -364,10 +365,10 @@
   .enemy-card.acting { border-color: #ff4040; background: rgba(255,64,64,0.12); animation: enemyActing 0.3s steps(1) infinite; }
   @keyframes enemyActing { 0%,49%{border-color:#ff4040;} 50%,100%{border-color:#ff8080;} }
   .enemy-card.dead { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-  .enemy-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: #e08080; margin-bottom: 5px; line-height: 1.6; }
+  .enemy-name { font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1); color: #e08080; margin-bottom: 5px; line-height: 1.6; }
   .hp-bar-wrap { margin-bottom: 4px; }
-  .bar-label { font-size: 7px; color: var(--text-dim); margin-bottom: 2px; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; }
-  .bar-outer { height: 9px; background: #000; border: 1px solid var(--border); position: relative; }
+  .bar-label { font-size: var(--fs); color: var(--text-dim); margin-bottom: 2px; display: flex; justify-content: space-between; font-family: 'Press Start 2P', monospace; }
+  .bar-outer { height: clamp(9px, 1.8vw, 11px); background: #000; border: 1px solid var(--border); position: relative; }
   .bar-inner { height: 100%; transition: width 0.15s steps(4); image-rendering: pixelated; }
   .bar-hp { background: var(--hp); }
   .bar-hp.low { background: var(--hp-low); animation: hpPulse 0.5s steps(1) infinite; }
@@ -376,7 +377,7 @@
 
   .status-icons { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; min-height: 14px; }
   .status-icon {
-    font-size: 7px; padding: 1px 3px;
+    font-size: var(--fs); padding: 1px 3px;
     border: 1px solid;
     font-family: 'Press Start 2P', monospace;
     line-height: 1.4;
@@ -395,7 +396,7 @@
     padding: 6px 12px;
     display: flex; align-items: center; gap: 8px;
   }
-  .shane-label { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--gold); flex-shrink: 0; }
+  .shane-label { font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1); color: var(--gold); flex-shrink: 0; }
   .shane-skills { display: flex; gap: 6px; flex: 1; }
   .shane-skill-btn {
     flex: 1;
@@ -403,7 +404,7 @@
     border: 2px solid var(--gold-dark);
     color: var(--gold-light);
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px;
+    font-size: var(--fs);
     padding: 7px 4px;
     cursor: pointer;
     text-align: center;
@@ -414,8 +415,8 @@
   .shane-skill-btn:active:not(:disabled) { transform: translate(2px,2px); box-shadow: none; background: rgba(240,192,64,0.15); }
   .shane-skill-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .shane-skill-btn.used-this-turn { border-color: var(--border); color: var(--text-dim); }
-  .cd-text { font-size: 7px; color: var(--text-dim); display: block; margin-top: 3px; }
-  .shane-skill-desc { font-size: 6px; color: var(--text-dim); display: block; margin-top: 2px; line-height: 1.6; }
+  .cd-text { font-size: var(--fs); color: var(--text-dim); display: block; margin-top: 3px; }
+  .shane-skill-desc { font-size: calc(var(--fs) * 0.85); color: var(--text-dim); display: block; margin-top: 2px; line-height: 1.6; }
 
   /* Party area */
   .party-area {
@@ -438,7 +439,7 @@
   .party-card.targetable-ally:active { background: rgba(32,192,64,0.1); }
   .party-card.targeted-ally { border-color: var(--hp); background: rgba(32,192,64,0.08); }
   .party-card.ko { opacity: 0.4; }
-  .party-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--gold-light); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.6; }
+  .party-name { font-family: 'Press Start 2P', monospace; font-size: var(--fs); color: var(--gold-light); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.6; }
   .ko-label {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
     font-family: 'Press Start 2P', monospace; font-size: 11px; font-weight: 900;
@@ -448,7 +449,7 @@
   }
   .order-badge {
     position: absolute; top: 3px; right: 5px;
-    font-size: 7px; color: var(--gold-dark);
+    font-size: var(--fs); color: var(--gold-dark);
     font-family: 'Press Start 2P', monospace;
   }
 
@@ -462,37 +463,38 @@
     -webkit-overflow-scrolling: touch;
   }
   .action-char-name {
-    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.2);
     color: var(--gold); margin-bottom: 8px;
     display: flex; align-items: center; gap: 6px;
     line-height: 1.6;
   }
-  .action-char-name .role-tag { font-size: 7px; color: var(--text-dim); font-family: 'Press Start 2P', monospace; }
+  .action-char-name .role-tag { font-size: var(--fs); color: var(--text-dim); font-family: 'Press Start 2P', monospace; }
   .action-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
   .action-btn {
     background: var(--panel);
     border: 2px solid var(--border);
     color: var(--text);
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px;
+    font-size: var(--fs);
     padding: 10px 6px;
     cursor: pointer;
     text-align: left;
     line-height: 1.8;
     box-shadow: 2px 2px 0 #000;
     -webkit-tap-highlight-color: transparent;
-    min-height: 66px;
+    min-height: unset;
+    overflow: hidden;
   }
   .action-btn:active:not(:disabled) { transform: translate(2px,2px); box-shadow: none; background: rgba(240,192,64,0.08); }
   .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-  .action-btn .skill-name { display: block; color: var(--gold-light); font-size: 7px; margin-bottom: 3px; line-height: 1.8; }
-  .action-btn .skill-mp { display: block; font-size: 7px; color: #4080ff; margin-top: 2px; }
-  .action-btn .skill-desc { display: block; font-size: 6px; color: var(--text-dim); margin-top: 3px; line-height: 1.8; }
+  .action-btn .skill-name { display: block; color: var(--gold-light); font-size: var(--fs); margin-bottom: 3px; line-height: 1.8; }
+  .action-btn .skill-mp { display: block; font-size: var(--fs); color: #4080ff; margin-top: 2px; }
+  .action-btn .skill-desc { display: block; font-size: calc(var(--fs) * 0.85); color: var(--text-dim); margin-top: 3px; line-height: 1.8; }
   .action-btn.basic { grid-column: span 3; min-height: 44px; }
   .bonus-tag {
     display: inline-block; margin-left: 4px;
     background: #f0a000; color: #000;
-    font-size: 6px; padding: 1px 3px;
+    font-size: calc(var(--fs) * 0.85); padding: 1px 3px;
     font-family: 'Press Start 2P', monospace;
     vertical-align: middle;
   }
@@ -503,13 +505,13 @@
     border: 2px solid var(--gold-dark);
     padding: 8px 12px;
     margin-bottom: 6px;
-    font-size: 7px; color: var(--gold-light);
+    font-size: var(--fs); color: var(--gold-light);
     display: none;
     font-family: 'Press Start 2P', monospace;
     line-height: 1.8;
   }
   .targeting-prompt.active { display: block; }
-  .cancel-target { font-size: 7px; color: var(--text-dim); cursor: pointer; margin-top: 4px; display: inline-block; }
+  .cancel-target { font-size: var(--fs); color: var(--text-dim); cursor: pointer; margin-top: 4px; display: inline-block; }
 
   /* Battle log */
   .battle-log {
@@ -518,7 +520,7 @@
     padding: 6px 12px;
     max-height: 80px;
     overflow-y: auto;
-    font-size: 7px;
+    font-size: var(--fs);
     font-family: 'Press Start 2P', monospace;
     color: var(--text-dim);
     line-height: 2;
@@ -529,7 +531,7 @@
   .log-entry.heal { color: #40e060; }
   .log-entry.buff { color: var(--gold-light); }
   .log-entry.debuff { color: #8080ff; }
-  .log-entry.system { color: var(--gold); font-size: 6px; }
+  .log-entry.system { color: var(--gold); font-size: calc(var(--fs) * 0.85); }
   .log-entry.ko { color: var(--hp-low); }
 
   /* Enemy overlay */
@@ -548,14 +550,14 @@
   }
   .enemy-action-text {
     font-family: 'Press Start 2P', monospace;
-    font-size: 9px; color: var(--text); max-width: 280px; line-height: 2;
+    font-size: calc(var(--fs) * 1.2); color: var(--text); max-width: 280px; line-height: 2;
   }
   .overlay-continue {
     background: #000;
     border: 3px solid var(--enemy-col);
     color: #e08080;
     font-family: 'Press Start 2P', monospace;
-    font-size: 9px; padding: 12px 24px; cursor: pointer;
+    font-size: calc(var(--fs) * 1.2); padding: 12px 24px; cursor: pointer;
     box-shadow: 4px 4px 0 #000;
     -webkit-tap-highlight-color: transparent;
   }
@@ -576,7 +578,7 @@
   }
   .end-title.victory { color: var(--gold); animation: pixelBlink 1s steps(1) infinite; }
   .end-title.defeat { color: var(--hp-low); animation: hpPulse 0.5s steps(1) infinite; }
-  .end-sub { font-size: 8px; color: var(--text-dim); max-width: 280px; line-height: 2; }
+  .end-sub { font-size: calc(var(--fs) * 1.1); color: var(--text-dim); max-width: 280px; line-height: 2; }
 
   /* Damage floats */
   .dmg-float {
@@ -601,7 +603,7 @@
     background: #000;
     border: 3px solid var(--gold-dark);
     color: var(--gold-light);
-    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1);
     padding: 10px 16px;
     z-index: 300; display: none;
     text-align: center; max-width: 260px; line-height: 2;
@@ -611,33 +613,6 @@
   @keyframes notifFade {
     0%,10% { opacity: 0; } 15%,70% { opacity: 1; } 100% { opacity: 0; }
   }
-
-  /* Confirm dialog */
-  .confirm-dialog {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.9);
-    display: none; align-items: center; justify-content: center;
-    z-index: 400; padding: 20px;
-  }
-  .confirm-dialog.active { display: flex; }
-  .confirm-box {
-    background: var(--panel2);
-    border: 3px solid var(--gold-dark);
-    box-shadow: 6px 6px 0 #000;
-    padding: 20px; max-width: 280px; width: 100%;
-    text-align: center;
-  }
-  .confirm-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 10px; line-height: 1.8; }
-  .confirm-desc { font-size: 7px; color: var(--text); margin-bottom: 14px; line-height: 2; }
-  .confirm-btns { display: flex; gap: 10px; justify-content: center; }
-  .debuff-select-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-  .debuff-option {
-    background: var(--panel); border: 2px solid var(--border);
-    padding: 8px 12px; cursor: pointer; font-size: 7px; color: var(--text);
-    font-family: 'Press Start 2P', monospace; line-height: 1.8;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .debuff-option:active { border-color: var(--gold); background: rgba(240,192,64,0.1); }
 
   /* Help modal */
   .help-modal {
@@ -653,7 +628,7 @@
     background: var(--panel2);
     border: 3px solid var(--gold-dark);
     box-shadow: 6px 6px 0 #000;
-    width: 100%; max-width: 460px;
+    width: 100%; max-width: clamp(460px, 80vw, 700px);
     margin: auto;
   }
   .help-header {
@@ -663,12 +638,12 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .help-header-title {
-    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.2);
     color: var(--gold);
   }
   .help-close {
     background: #000; border: 2px solid var(--text-dim);
-    color: var(--text-dim); font-size: 10px; cursor: pointer;
+    color: var(--text-dim); font-size: calc(var(--fs) * 1.2); cursor: pointer;
     padding: 4px 8px; font-family: 'Press Start 2P', monospace;
     box-shadow: 2px 2px 0 #000;
     -webkit-tap-highlight-color: transparent;
@@ -677,7 +652,7 @@
   .help-body { padding: 14px; }
   .help-intro {
     font-family: 'Press Start 2P', monospace;
-    font-size: 8px; color: var(--text-dim);
+    font-size: calc(var(--fs) * 1.1); color: var(--text-dim);
     line-height: 2; margin-bottom: 14px; padding-bottom: 10px;
     border-bottom: 2px solid var(--border);
   }
@@ -687,19 +662,19 @@
   }
   .help-char-entry:last-child { border-bottom: none; margin-bottom: 0; }
   .help-char-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-  .help-char-name { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold-light); line-height: 1.8; }
-  .help-char-role { font-size: 7px; color: var(--text-dim); margin-top: 2px; line-height: 1.8; }
-  .help-char-summary { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--text); line-height: 2; margin-bottom: 5px; }
+  .help-char-name { font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.2); color: var(--gold-light); line-height: 1.8; }
+  .help-char-role { font-size: var(--fs); color: var(--text-dim); margin-top: 2px; line-height: 1.8; }
+  .help-char-summary { font-family: 'Press Start 2P', monospace; font-size: var(--fs); color: var(--text); line-height: 2; margin-bottom: 5px; }
   .help-skill-list { padding-left: 0; list-style: none; }
   .help-skill-item {
     font-family: 'Press Start 2P', monospace;
-    font-size: 7px; color: var(--text-dim); line-height: 2;
+    font-size: var(--fs); color: var(--text-dim); line-height: 2;
     margin-bottom: 3px; padding-left: 10px; position: relative;
   }
   .help-skill-item::before { content: '>'; position: absolute; left: 0; color: var(--gold-dark); }
-  .help-skill-name { color: var(--gold-light); font-size: 7px; }
+  .help-skill-name { color: var(--gold-light); font-size: var(--fs); }
   .help-section-title {
-    font-family: 'Press Start 2P', monospace; font-size: 8px;
+    font-family: 'Press Start 2P', monospace; font-size: calc(var(--fs) * 1.1);
     color: var(--gold-dark);
     margin: 10px 0 6px; text-transform: uppercase; line-height: 1.8;
   }
@@ -763,7 +738,7 @@
   </div>
   <div class="reorder-slots" id="reorder-slots"></div>
   <div class="drag-hint">Tap two characters to swap their order</div>
-  <div id="hp-carry-notice" style="display:none;margin:0 12px 8px;padding:8px 10px;border:1px solid #604020;background:rgba(96,40,0,0.2);font-family:'Press Start 2P',monospace;font-size:6px;color:#c08040;line-height:2;text-align:center;">
+  <div id="hp-carry-notice" style="display:none;margin:0 12px 8px;padding:8px 10px;border:1px solid #604020;background:rgba(96,40,0,0.2);font-family:'Press Start 2P',monospace;font-size:var(--fs);color:#c08040;line-height:2;text-align:center;">
     ⚠ HP carries over from last rotation. MP partially restored.
   </div>
   <div style="padding:16px;">
@@ -777,7 +752,7 @@
     <div class="rotation-label" id="battle-rotation-label">ROTATION 1</div>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="turn-label" id="turn-label">Turn 1</div>
-      <button id="auto-btn" onclick="toggleAutoAdvance()" style="background:#000;border:1px solid var(--border);color:var(--text-dim);font-family:'Press Start 2P',monospace;font-size:5px;padding:4px 6px;cursor:pointer;" title="Toggle auto-advance enemy turns">AUTO: OFF</button>
+      <button id="auto-btn" onclick="toggleAutoAdvance()" style="background:#000;border:1px solid var(--border);color:var(--text-dim);font-family:'Press Start 2P',monospace;font-size:calc(var(--fs) * 0.85);padding:4px 6px;cursor:pointer;" title="Toggle auto-advance enemy turns">AUTO: OFF</button>
     </div>
   </div>
 
@@ -844,19 +819,6 @@
   </div>
 </div>
 
-<!-- Confirm dialog -->
-<div class="confirm-dialog" id="confirm-dialog">
-  <div class="confirm-box">
-    <div class="confirm-title" id="confirm-title"></div>
-    <div class="confirm-desc" id="confirm-desc"></div>
-    <div id="debuff-select-area" class="debuff-select-list"></div>
-    <div class="confirm-btns">
-      <button class="btn" id="confirm-yes">Confirm</button>
-      <button class="btn" onclick="closeConfirm()">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <!-- Notification -->
 <div class="notif-banner" id="notif-banner"></div>
 
@@ -871,18 +833,18 @@ const CHARACTER_DATA = [
     tags:['atk','util'],
     hp:320, mp:60, atk:85,
     skills:[
-      {name:'Battering Ram', mp:20, type:'dmg', target:'enemy', formula:2.5, desc:'Massive single-target damage'},
-      {name:'Tax Recovery', mp:15, type:'dmg_heal_self', target:'enemy', formula:1.5, desc:'Damage + heal self equal to damage dealt'},
-      {name:'Tax Mobile of Justice', mp:20, type:'dmg_stun', target:'enemy', formula:1.5, desc:'Damage + Stun target 1 turn'},
+      {name:'Battering Ram', mp:20, type:'dmg', target:'enemy', formula:2.5, desc:'ATK×2.5 damage to one enemy'},
+      {name:'Tax Recovery', mp:15, type:'dmg_heal_self', target:'enemy', formula:1.5, desc:'ATK×1.5 damage; heal self for damage dealt'},
+      {name:'Tax Mobile of Justice', mp:20, type:'dmg_stun', target:'enemy', formula:1.5, desc:'ATK×1.5 damage + Stun target (1 turn)'},
     ]
   },
   {
     id:'karishma', name:'Karishma Jayakumar', role:'Customer Service Officer',
-    tags:['heal'],
+    tags:['heal','util'],
     hp:260, mp:100, atk:40,
     skills:[
-      {name:'"Hi, I\'m Karishma! How can I help you?"', mp:20, type:'aoe_heal', target:'party', amount:70, desc:'AOE heal 70 HP to all party members'},
-      {name:'Tax Relief', mp:15, type:'heal', target:'ally', amount:110, desc:'Large single-target heal (110 HP)'},
+      {name:'"Hi, I\'m Karishma! How can I help you?"', mp:20, type:'aoe_heal', target:'party', amount:70, desc:'Heal all party members (70 HP each)'},
+      {name:'Tax Relief', mp:15, type:'heal', target:'ally', amount:110, desc:'Heal one ally (110 HP)'},
       {name:'Extension of Deadline', mp:30, type:'revive', target:'ally_ko', revivePct:0.40, desc:'Revive KO\'d ally at 40% HP'},
     ]
   },
@@ -891,9 +853,9 @@ const CHARACTER_DATA = [
     tags:['atk','debuff'],
     hp:280, mp:70, atk:95,
     skills:[
-      {name:'Hammer of Justice', mp:20, type:'dmg', target:'enemy', formula:2.5, desc:'Massive single-target damage'},
-      {name:'Summon to Court', mp:15, type:'dmg_stun', target:'enemy', formula:1.5, desc:'Damage + Stun target 1 turn'},
-      {name:'Legal Injunction', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on enemy for 3 turns'},
+      {name:'Hammer of Justice', mp:20, type:'dmg', target:'enemy', formula:2.5, desc:'ATK×2.5 damage to one enemy'},
+      {name:'Summon to Court', mp:15, type:'dmg_stun', target:'enemy', formula:1.5, desc:'ATK×1.5 damage + Stun target (1 turn)'},
+      {name:'Legal Injunction', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on one enemy (3 turns)'},
     ]
   },
   {
@@ -901,9 +863,9 @@ const CHARACTER_DATA = [
     tags:['debuff','buff','atk'],
     hp:290, mp:85, atk:71,
     skills:[
-      {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on enemy for 3 turns'},
-      {name:'Public Consultation', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
-      {name:'Revenue Games', mp:20, type:'aoe_buff', target:'party', effect:'atkup', duration:3, desc:'Attack Up on all party members for 3 turns'},
+      {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on one enemy (3 turns)'},
+      {name:'Public Consultation', mp:20, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
+      {name:'Revenue Games', mp:20, type:'aoe_buff', target:'party', effect:'atkup', duration:3, desc:'Attack Up on all party members (3 turns)'},
     ]
   },
   {
@@ -911,9 +873,9 @@ const CHARACTER_DATA = [
     tags:['tank','debuff'],
     hp:380, mp:65, atk:60,
     skills:[
-      {name:'Input Tax', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self 100 HP'},
-      {name:'Output Tax', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'atkdown', duration:3, desc:'Damage + Attack Down on enemy for 3 turns'},
-      {name:'Tax Treaty', mp:15, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down to all party for 2 turns'},
+      {name:'Input Tax', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self (100 HP)'},
+      {name:'Output Tax', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'atkdown', duration:3, desc:'ATK×1.5 damage + Attack Down on target (3 turns)'},
+      {name:'Tax Treaty', mp:15, type:'aoe_buff', target:'party', effect:'dmgdown', duration:2, desc:'Damage Received Down on all party (2 turns)'},
     ]
   },
   {
@@ -921,29 +883,29 @@ const CHARACTER_DATA = [
     tags:['debuff','atk'],
     hp:300, mp:80, atk:65,
     skills:[
-      {name:'Publicity Campaign', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'AOE Attack Down on all enemies for 2 turns'},
-      {name:'Survey', mp:15, type:'aoe_debuff', target:'enemies', effect:'dmgup', duration:2, desc:'AOE Damage Received Up on all enemies for 2 turns'},
-      {name:"President's Challenge", mp:25, type:'aoe_drain', target:'enemies', formula:0.7, desc:'AOE HP drain; self recovers total drained'},
+      {name:'Publicity Campaign', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'Attack Down on all enemies (2 turns)'},
+      {name:'Survey', mp:15, type:'aoe_debuff', target:'enemies', effect:'dmgup', duration:2, desc:'Damage Received Up on all enemies (2 turns)'},
+      {name:"President's Challenge", mp:25, type:'aoe_drain', target:'enemies', formula:0.7, desc:'ATK×0.7 drain on all enemies; self recovers total HP drained'},
     ]
   },
   {
     id:'bethany', name:'Bethany Su', role:'AI Lead',
-    tags:['atk','util','heal'],
+    tags:['atk','debuff','heal'],
     hp:260, mp:95, atk:71,
     skills:[
-      {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'AOE damage to all enemies'},
-      {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.3, desc:'Damage + Attack Down + 30% Stun'},
-      {name:'Make Pasta', mp:10, type:'heal', target:'ally', amount:90, desc:'Small heal to one ally (90 HP)'},
+      {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
+      {name:'Hack', mp:20, type:'dmg_debuff_stun', target:'enemy', formula:1.5, effect:'atkdown', duration:2, stunChance:0.3, desc:'ATK×1.5 damage + Attack Down (2 turns) + 30% chance Stun'},
+      {name:'Make Pasta', mp:10, type:'heal', target:'ally', amount:90, desc:'Heal one ally (90 HP)'},
     ]
   },
   {
     id:'jiawei', name:'Jiawei Tan', role:'Software Developer',
-    tags:['atk','util'],
+    tags:['atk','util','heal'],
     hp:280, mp:80, atk:90,
     skills:[
-      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:2.0, selfHpFlat:30, desc:'ATK×2.0 damage + lose 30 HP (can be fatal)'},
+      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:2.0, selfHpFlat:30, desc:'ATK×2.0 damage; lose 30 HP (can be fatal)'},
       {name:'Blood Donation', mp:15, type:'revive_self_dmg', target:'ally_ko', selfHpFlat:70, revivePct:0.38, desc:'Lose 70 HP to revive a KO\'d ally at 38% HP (can be fatal)'},
-      {name:'Dessert for Dinner', mp:15, type:'heal_self', target:'self', amount:65, desc:'Recover 65 HP to self'},
+      {name:'Dessert for Dinner', mp:15, type:'heal_self', target:'self', amount:65, desc:'Heal self (65 HP)'},
     ]
   },
   {
@@ -951,9 +913,9 @@ const CHARACTER_DATA = [
     tags:['debuff','atk'],
     hp:290, mp:65, atk:79,
     skills:[
-      {name:'Audit Finding', mp:10, type:'debuff', target:'enemy', effect:'dmgup', duration:3, desc:'Damage Received Up on enemy for 3 turns'},
-      {name:'Tax Recovery', mp:15, type:'dmg_heal_self', target:'enemy', formula:1.5, desc:'Damage + heal self equal to damage dealt'},
-      {name:'Impose Penalty', mp:20, type:'dmg_bonus', target:'enemy', formula:2.0, bonusFormula:2.5, bonusCondition:'dmgup', desc:'Heavy damage; ATK×2.5 if target has Damage Received Up'},
+      {name:'Audit Finding', mp:10, type:'debuff', target:'enemy', effect:'dmgup', duration:3, desc:'Damage Received Up on one enemy (3 turns)'},
+      {name:'Tax Recovery', mp:15, type:'dmg_heal_self', target:'enemy', formula:1.5, desc:'ATK×1.5 damage; heal self for damage dealt'},
+      {name:'Impose Penalty', mp:20, type:'dmg_bonus', target:'enemy', formula:2.0, bonusFormula:2.5, bonusCondition:'dmgup', desc:'ATK×2.0 damage; ATK×2.5 if target has Damage Received Up'},
     ]
   },
   {
@@ -961,9 +923,9 @@ const CHARACTER_DATA = [
     tags:['heal','atk','util'],
     hp:340, mp:95, atk:62,
     skills:[
-      {name:'Dinner & Dance', mp:15, type:'aoe_heal', target:'party', amount:40, desc:'Small AOE heal (40 HP) to all party'},
+      {name:'Dinner & Dance', mp:15, type:'aoe_heal', target:'party', amount:40, desc:'Heal all party members (40 HP each)'},
       {name:'Procurement Request', mp:10, type:'mp_restore', target:'ally', amount:25, desc:'Restore 25 MP to one ally'},
-      {name:'Omelette Bomb', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'dmgup', duration:2, desc:'Damage (ATK x1.5) + Damage Received Up on enemy for 2 turns'},
+      {name:'Omelette Bomb', mp:15, type:'dmg_debuff', target:'enemy', formula:1.5, effect:'dmgup', duration:2, desc:'ATK×1.5 damage + Damage Received Up on target (2 turns)'},
     ]
   },
   {
@@ -971,26 +933,27 @@ const CHARACTER_DATA = [
     tags:['atk','buff','heal'],
     hp:290, mp:80, atk:65,
     skills:[
-      {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'Heavy damage (ATK×2.0) + Stun target 1 turn'},
-      {name:'Violet Defence', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally for 2 turns'},
+      {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'ATK×2.0 damage + Stun target (1 turn)'},
+      {name:'Violet Defence', mp:15, type:'buff', target:'ally', effect:'dmgdown', duration:2, desc:'Damage Received Down on one ally (2 turns)'},
       {name:'Undying Project', mp:25, type:'revive', target:'ally_ko', revivePct:0.25, desc:'Revive KO\'d ally at 25% HP'},
     ]
   },
 ];
 
 const ENEMY_DATA = {
-  minion: {name:'Minion', hp:120, atk:40, isBoss:false},
-  sad: {name:'SAD', hp:220, atk:60, isBoss:false},
-  director: {name:'Director', hp:300, atk:75, isBoss:false,
+  minion: {name:'Minion', hp:160, atk:40, isBoss:false},
+  sad: {name:'SAD', hp:300, atk:60, isBoss:false},
+  director: {name:'Dir', hp:420, atk:75, isBoss:false,
     skills:[
       {name:'Reject Submission', type:'dmg', formula:2.0},
     ]
   },
-  ceo: {name:'CEO', hp:700, atk:95, isBoss:true, stunImmune:true,
+  ceo: {name:'CEO', hp:950, atk:95, isBoss:true, stunImmune:true,
     skills:[
       {name:'Choose CM Sec', type:'debuff', effect:'atkdown', duration:3, target:'party_member'},
       {name:'Set Up Working Group', type:'buff', effect:'atkup', duration:3, target:'self'},
       {name:'Impose Double Hatting', type:'aoe_dmg', formula:0.8, target:'all_party'},
+      {name:'Direct Arrow', type:'single_dmg', formula:2.0, target:'lowest_hp'},
     ]
   }
 };
@@ -1021,7 +984,7 @@ const STATUS_LABELS = {
   stun:{label:'STUN',cls:'si-stun'},
 };
 
-const DIFF_MULT = {easy:0.75, normal:1.0, hard:1.1};
+const DIFF_MULT = {easy:0.75, normal:1.0, hard:1.2};
 const MP_RESTORE_BETWEEN = {easy:0.75, normal:0.65, hard:0.4};
 
 // ══════════════════════════════════════════
@@ -1192,7 +1155,7 @@ function buildReorderSlots() {
         <div class="reorder-name">${ch.name}</div>
         <div class="reorder-role">${ch.role}${ch.ko ? ' [KO]':''}</div>
       </div>
-      <div style="margin-left:auto;font-size:6px;font-family:'Press Start 2P',monospace;color:${ch.hp/ch.maxHp>0.6?'#40e060':ch.hp/ch.maxHp>0.3?'#f0a000':'#ff4040'}">${ch.hp}/${ch.maxHp}<br><span style="color:${ch.mp/ch.maxMp>0.4?'#4080ff':'#ff6060'}">${ch.mp}/${ch.maxMp} MP</span></div>
+      <div style="margin-left:auto;font-size:var(--fs);font-family:'Press Start 2P',monospace;color:${ch.hp/ch.maxHp>0.6?'#40e060':ch.hp/ch.maxHp>0.3?'#f0a000':'#ff4040'}">${ch.hp}/${ch.maxHp}<br><span style="color:${ch.mp/ch.maxMp>0.4?'#4080ff':'#ff6060'}">${ch.mp}/${ch.maxMp} MP</span></div>
     `;
     slot.onclick = () => reorderTap(i);
     container.appendChild(slot);
@@ -1466,10 +1429,6 @@ function buildSkillButton(ch, sk, si, charIdx) {
 }
 
 function checkSkillNoTarget(ch, sk, charIdx) {
-  if (sk.type === 'cleanse') {
-    // disabled if no ally has debuffs... but allow anyway (we warn on target select)
-    return false;
-  }
   if (sk.type === 'revive' || sk.target === 'ally_ko') {
     return !G.party.some(p => p.ko);
   }
@@ -1582,49 +1541,9 @@ function selectAllyTarget(allyIdx) {
   clearTargetHighlights();
   document.getElementById('targeting-prompt').classList.remove('active');
   targetingState = null;
-
-  // Special: cleanse — need to pick debuff
-  if (sk.type === 'cleanse') {
-    const target = G.party[allyIdx];
-    const debuffs = target.status.filter(s => ['atkdown','dmgup','stun'].includes(s.type));
-    if (debuffs.length === 0) {
-      showNotif('No debuffs to remove!');
-      showActionPanel(charIdx);
-      return;
-    }
-    if (debuffs.length === 1) {
-      executeSkill(charIdx, skillIdx, allyIdx, debuffs[0].type);
-    } else {
-      showDebuffSelect(charIdx, skillIdx, allyIdx, debuffs);
-      return;
-    }
-  } else {
-    executeSkill(charIdx, skillIdx, allyIdx);
-  }
+  executeSkill(charIdx, skillIdx, allyIdx);
 }
 
-function showDebuffSelect(charIdx, skillIdx, allyIdx, debuffs) {
-  const dialog = document.getElementById('confirm-dialog');
-  document.getElementById('confirm-title').textContent = 'Remove which debuff?';
-  document.getElementById('confirm-desc').textContent = `Select a debuff to remove from ${G.party[allyIdx].name}`;
-  const area = document.getElementById('debuff-select-area');
-  area.innerHTML = debuffs.map(d =>
-    `<div class="debuff-option" onclick="pickDebuff('${charIdx}','${skillIdx}','${allyIdx}','${d.type}')">${STATUS_LABELS[d.type]?.label || d.type} (${d.duration} turns)</div>`
-  ).join('');
-  document.getElementById('confirm-yes').style.display = 'none';
-  dialog.classList.add('active');
-}
-
-function pickDebuff(charIdx, skillIdx, allyIdx, debuffType) {
-  closeConfirm();
-  document.getElementById('confirm-yes').style.display = '';
-  executeSkill(parseInt(charIdx), parseInt(skillIdx), parseInt(allyIdx), debuffType);
-}
-
-function closeConfirm() {
-  document.getElementById('confirm-dialog').classList.remove('active');
-  document.getElementById('debuff-select-area').innerHTML = '';
-}
 
 // ══════════════════════════════════════════
 // EXECUTE BASIC ATTACK
@@ -1645,7 +1564,7 @@ function executeBasicAttack(charIdx, enemyIdx) {
 // EXECUTE SKILL
 // ══════════════════════════════════════════
 
-function executeSkill(charIdx, skillIdx, targetIdx, extra) {
+function executeSkill(charIdx, skillIdx, targetIdx) {
   const ch = G.party[charIdx];
   const sk = ch.skills[skillIdx];
   ch.mp = Math.max(0, ch.mp - sk.mp);
@@ -1663,11 +1582,15 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     const en = G.enemies[targetIdx];
     const dmg = calcDamage(ch, en, sk.formula);
     dealDamageToEnemy(targetIdx, dmg);
-    const heal = Math.min(dmg, ch.maxHp - ch.hp);
-    ch.hp = Math.min(ch.maxHp, ch.hp + heal);
-    addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage, recovers ${heal} HP!`, 'heal');
     floatNumber(dmg, 'enemy-card-'+targetIdx, 'damage');
-    floatNumber(heal, 'party-card-'+charIdx, 'heal');
+    if (!en.dead || dmg > 0) {
+      const heal = Math.min(dmg, ch.maxHp - ch.hp);
+      ch.hp = Math.min(ch.maxHp, ch.hp + heal);
+      if (heal > 0) floatNumber(heal, 'party-card-'+charIdx, 'heal');
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage, recovers ${heal} HP!`, 'heal');
+    } else {
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage!`, 'damage');
+    }
   }
   else if (t === 'dmg_stun') {
     const en = G.enemies[targetIdx];
@@ -1785,8 +1708,12 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     const dmg = calcDamage(ch, en, sk.formula);
     dealDamageToEnemy(targetIdx, dmg);
     floatNumber(dmg, 'enemy-card-'+targetIdx, 'damage');
-    if (!en.dead) applyStatus(en, sk.effect, sk.duration);
-    addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage + ${STATUS_LABELS[sk.effect]?.label}!`, 'debuff');
+    if (!en.dead) {
+      applyStatus(en, sk.effect, sk.duration);
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage + ${STATUS_LABELS[sk.effect]?.label}!`, 'debuff');
+    } else {
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage!`, 'damage');
+    }
   }
   else if (t === 'dmg_debuff_stun') {
     const en = G.enemies[targetIdx];
@@ -1848,12 +1775,6 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     floatNumber(healed, 'party-card-'+charIdx, 'heal');
     msg += ` ${ch.name.split(' ')[0]} recovers ${healed} HP!`;
     addLog(msg, 'heal');
-  }
-  else if (t === 'cleanse') {
-    const target = G.party[targetIdx];
-    removeStatus(target, extra);
-    addLog(`${ch.name} uses ${sk.name} — removes ${STATUS_LABELS[extra]?.label || extra} from ${target.name}!`, 'buff');
-    floatNumber('✓', 'party-card-'+targetIdx, 'heal');
   }
   else if (t === 'mp_restore') {
     const target = G.party[targetIdx];
@@ -1946,6 +1867,9 @@ function executeShaneSkill(idx, targetIdx) {
   }
   renderShane();
   renderParty();
+  if (G.phase === 'player' && !G.party[G.currentActorIndex]?.ko) {
+    showActionPanel(G.currentActorIndex);
+  }
 }
 
 // ══════════════════════════════════════════
@@ -1990,7 +1914,7 @@ function processNextEnemy() {
   let action;
   if (en.isBoss && en.skills) {
     action = chooseCEOAction(en);
-  } else if (en.skills && en.skills.length > 0 && Math.random() < 0.25) {
+  } else if (en.skills && en.skills.length > 0 && Math.random() < 0.40) {
     action = {type:'director_skill', skill: en.skills[0]};
   } else {
     action = {type:'basic'};
@@ -2005,7 +1929,7 @@ function processNextEnemy() {
     const dmg = calcDamage(en, target);
     dealDamageToParty(tIdx, dmg);
     floatNumber(dmg, 'party-card-'+tIdx, 'damage');
-    actionText = `${en.name} attacks ${target.name} for ${dmg} damage!`;
+    let actionText = `${en.name} attacks ${target.name} for ${dmg} damage!`;
     highlightActiveEnemy(enIdx);
     showEnemyOverlay(en.name, actionText, () => {
       clearEnemyHighlight();
@@ -2018,9 +1942,9 @@ function processNextEnemy() {
   } else if (action.type === 'debuff') {
     const targets = G.party.filter(p=>!p.ko);
     if (targets.length === 0) { endGame(false); return; }
-    const target = targets[Math.floor(Math.random()*targets.length)];
+    const target = targets.reduce((best, p) => p.atk > best.atk ? p : best, targets[0]);
     applyStatus(target, action.skill.effect, action.skill.duration);
-    actionText = `CEO uses ${action.skill.name}! ${target.name} suffers ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
+    let actionText = `CEO uses ${action.skill.name}! ${target.name} suffers ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
     highlightActiveEnemy(enIdx);
     showEnemyOverlay('CEO', actionText, () => {
       clearEnemyHighlight();
@@ -2029,9 +1953,27 @@ function processNextEnemy() {
       G.enemyQueueIndex++;
       processNextEnemy();
     });
+  } else if (action.type === 'single_dmg') {
+    const targets = G.party.filter(p => !p.ko);
+    if (targets.length === 0) { endGame(false); return; }
+    const target = targets.reduce((lowest, p) => p.hp < lowest.hp ? p : lowest, targets[0]);
+    const tIdx = G.party.indexOf(target);
+    const dmg = calcDamage(en, target, action.skill.formula);
+    dealDamageToParty(tIdx, dmg);
+    floatNumber(dmg, 'party-card-'+tIdx, 'damage');
+    let actionText = `CEO uses ${action.skill.name} on ${target.name} for ${dmg} damage!`;
+    highlightActiveEnemy(enIdx);
+    showEnemyOverlay('CEO', actionText, () => {
+      clearEnemyHighlight();
+      addLog(actionText, 'damage');
+      tickStatuses(en);
+      G.enemyQueueIndex++;
+      checkWipe();
+      if (!isGameOver()) processNextEnemy();
+    });
   } else if (action.type === 'buff') {
     applyStatus(en, action.skill.effect, action.skill.duration);
-    actionText = `CEO uses ${action.skill.name}! Gains ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
+    let actionText = `CEO uses ${action.skill.name}! Gains ${STATUS_LABELS[action.skill.effect]?.label} for ${action.skill.duration} turns!`;
     highlightActiveEnemy(enIdx);
     showEnemyOverlay('CEO', actionText, () => {
       clearEnemyHighlight();
@@ -2071,7 +2013,7 @@ function processNextEnemy() {
     const dmg = calcDamage(en, target, action.skill.formula);
     dealDamageToParty(tIdx, dmg);
     floatNumber(dmg, 'party-card-'+tIdx, 'damage');
-    actionText = `${en.name} uses ${action.skill.name} on ${target.name} for ${dmg} damage!`;
+    let actionText = `${en.name} uses ${action.skill.name} on ${target.name} for ${dmg} damage!`;
     highlightActiveEnemy(enIdx);
     showEnemyOverlay(en.name, actionText, () => {
       clearEnemyHighlight();
@@ -2088,15 +2030,12 @@ function chooseCEOAction(ceo) {
   const skills = ceo.skills;
   const atkUpActive = hasStatus(ceo, 'atkup');
   const aliveParty = G.party.filter(p=>!p.ko);
-  // Weighted logic
   const weights = [];
-  // Set Up Working Group — prefer if no atk up
-  weights.push({type:'buff', skill:skills[1], w: atkUpActive ? 1 : 4});
-  // Choose CM Sec — prefer if party has high-atk members not debuffed
-  weights.push({type:'debuff', skill:skills[0], w: 3});
-  // Impose Double Hatting — prefer if multiple party members healthy
+  weights.push({type:'buff',       skill:skills[1], w: atkUpActive ? 1 : 4});
+  weights.push({type:'debuff',     skill:skills[0], w: 3});
   const healthyCount = aliveParty.filter(p => p.hp > p.maxHp*0.5).length;
-  weights.push({type:'aoe_dmg', skill:skills[2], w: healthyCount >= 2 ? 4 : 1});
+  weights.push({type:'aoe_dmg',    skill:skills[2], w: healthyCount >= 2 ? 4 : 1});
+  weights.push({type:'single_dmg', skill:skills[3], w: 3});
 
   const total = weights.reduce((s,w) => s+w.w, 0);
   let r = Math.random() * total;
@@ -2165,7 +2104,7 @@ function applyStatus(entity, type, duration) {
     const oldDur = existing.duration;
     existing.duration = Math.max(existing.duration, duration);
     // #18 Log if a buff was refreshed (duration kept same or extended)
-    if (existing.duration >= oldDur && oldDur > 0) {
+    if (existing.duration > oldDur) {
       // Only log for party members (have 'id' field, not 'key')
       if (entity.id && !entity.key) {
         addLog(`${entity.name}'s ${STATUS_LABELS[type]?.label || type} refreshed (${existing.duration} turns).`, 'buff');
@@ -2300,7 +2239,7 @@ function endGame(victory) {
     title.textContent = 'VICTORY';
     title.className = 'end-title victory';
     sub.innerHTML = `Amazing - PG 5 for you.<br><br>
-      <span style="font-size:6px;color:var(--text-dim)">
+      <span style="font-size:calc(var(--fs) * 0.85);color:var(--text-dim)">
         DIFFICULTY: ${G.difficulty.toUpperCase()}<br>
         SQUAD: ${squadNames}<br>
         TURNS: ${G.turn}<br>
@@ -2310,7 +2249,7 @@ function endGame(victory) {
     title.textContent = 'MISSION FAILED';
     title.className = 'end-title defeat';
     sub.innerHTML = `The CEO escapes... for now.<br><br>
-      <span style="font-size:6px;color:var(--text-dim)">
+      <span style="font-size:calc(var(--fs) * 0.85);color:var(--text-dim)">
         DIFFICULTY: ${G.difficulty.toUpperCase()}<br>
         SQUAD: ${squadNames}<br>
         TURNS: ${G.turn}
@@ -2325,7 +2264,6 @@ function clearTransientState() {
   overlayCallback = null;
   G_autoAdvance = false;
   document.getElementById('enemy-overlay').classList.remove('active');
-  document.getElementById('confirm-dialog').classList.remove('active');
   document.getElementById('help-modal').classList.remove('active');
   document.getElementById('targeting-prompt').classList.remove('active');
 }
@@ -2796,17 +2734,17 @@ window.addEventListener('DOMContentLoaded', () => {
 // ══════════════════════════════════════════
 
 const CHAR_SUMMARIES = {
-  ryan:      { summary: "High-damage frontliner who heals himself when he hits. Tight MP budget - pick your big swings carefully.", role: "Attacker / Self-sustain" },
-  karishma:  { summary: "The squad's primary healer and only full-strength reviver. Hard to replace on Hard difficulty - protect her.", role: "Healer / Reviver" },
-  sylvester: { summary: "Highest ATK in the roster. Pure burst damage with a stun and a debuff. Glass cannon - hits the hardest but needs support.", role: "Attacker / Control" },
-  janus:     { summary: "Scholar who debuffs enemies, buffs the whole party, and lands AOE nukes. Revenue Games gives ATK Up to all officers at once — use it before a big offensive push.", role: "Buffer / Debuffer / AOE" },
-  shaun:     { summary: "The squad's defensive anchor. Self-heals to stay alive, applies Attack Down to weaken enemies with Output Tax, and shields the whole party with Tax Treaty. Slow but nearly impossible to kill.", role: "Tank / Debuffer" },
-  arif:      { summary: "AOE controller who weakens the entire enemy formation. Publicity Campaign and Survey both hit all enemies, setting up President's Challenge drain for maximum recovery.", role: "AOE Debuffer / Drain" },
-  bethany:   { summary: "AOE damage dealer who can also disrupt enemies and spot-heal allies. Fragile but versatile. Best in multi-enemy rotations.", role: "AOE / Utility" },
-  jiawei:    { summary: "Glass cannon who manages his own HP as a resource. Caffeine Overload hits hard but costs 30 HP per cast. Dessert for Dinner patches him back up. Blood Donation is the dramatic last resort — sacrifices his own HP to revive a fallen ally. Keep the loop going.", role: "Attacker / Self-sustain / Reviver" },
-  richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
-  angel:     { summary: "The squad's MP battery who can also deal damage. Procurement Request keeps allies casting, Dinner and Dance patches the whole party, and Omelette Bomb deals damage while making enemies more vulnerable.", role: "Support / Attacker" },
-  jasper:    { summary: "Stun-damage dealer who protects a key ally and revives fallen ones. Rejected by MOF hits hard with a stun, Violet Defence guards your most vulnerable officer, Undying Project pulls someone back from KO.", role: "Attacker / Support / Reviver" },
+  ryan:      { summary: "Hard-hitting attacker who heals himself on every hit. Tax Recovery makes him self-sufficient, and Tax Mobile of Justice adds disruption when needed. Tight MP pool — spend it on the right moments.", role: "Attacker / Self-sustain" },
+  karishma:  { summary: "The squad's primary healer with the strongest revive in the roster. Hard to replace on Hard difficulty — if she goes down, recovery becomes very difficult. Keep her protected.", role: "Healer / Reviver" },
+  sylvester: { summary: "Highest ATK in the roster — hits harder than anyone else. Legal Injunction applies a long-lasting Attack Down cheaply, while Summon to Court adds a stun. No self-sustain, so he needs support to stay in the fight.", role: "Attacker / Control" },
+  janus:     { summary: "Sets up the whole party for big turns. Policy Review weakens enemies cheaply, Revenue Games gives ATK Up to all officers at once, and Public Consultation clears out weaker enemies. Best used before your attackers act.", role: "Debuffer / Buffer / AOE Attacker" },
+  shaun:     { summary: "The squad's defensive anchor — nearly impossible to kill. Input Tax keeps him healthy, Output Tax weakens enemies with Attack Down, and Tax Treaty reduces damage taken by the whole party. Slow to deal damage but invaluable on Hard.", role: "Tank / Debuffer" },
+  arif:      { summary: "Weakens the entire enemy formation with two AOE debuffs. Publicity Campaign lowers enemy ATK, Survey raises damage they take, then President's Challenge drains their HP and heals Arif for the total. Scales with enemy count — strongest in Waves 2 and 3.", role: "AOE Debuffer / Drain" },
+  bethany:   { summary: "Flexible officer who covers AOE damage, disruption, and spot healing in one slot. Hack applies Attack Down and has a 30% stun chance. Deploy Bot hits all enemies. Make Pasta patches up a wounded ally. Best when facing multiple enemies.", role: "AOE Attacker / Debuffer / Healer" },
+  jiawei:    { summary: "Manages his own HP as a second resource. Caffeine Overload deals strong damage but costs 30 HP per cast — Dessert for Dinner patches him back up. Blood Donation revives a fallen ally at the cost of his own HP. Keep the cycle going and he carries fights.", role: "Attacker / Self-sustain / Reviver" },
+  richmond:  { summary: "Deals bonus damage when enemies are set up correctly. Apply Audit Finding first, then Impose Penalty hits at ATK×2.5 instead of ×2.0. Tax Recovery sustains him between setups. Rewards planning over brute force.", role: "Attacker / Debuffer" },
+  angel:     { summary: "Keeps the whole party resourced and fighting. Procurement Request restores 25 MP to any ally for just 10 MP — the best MP efficiency in the game. Dinner & Dance patches the whole party cheaply, and Omelette Bomb deals damage while setting up bigger hits.", role: "Support / Attacker" },
+  jasper:    { summary: "Disrupts enemies and protects allies while contributing solid damage. Rejected by MOF hits hard and stuns. Violet Defence shields your most vulnerable officer. Undying Project brings back a fallen ally when you need a second chance.", role: "Attacker / Support / Reviver" },
 };
 
 function buildHelpContent() {
