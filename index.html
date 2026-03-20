@@ -941,9 +941,9 @@ const CHARACTER_DATA = [
     tags:['atk','util'],
     hp:280, mp:80, atk:90,
     skills:[
-      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:1.5, selfHpFlat:20, desc:'ATK×1.5 damage + lose 20 HP (can be fatal)'},
+      {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:2.0, selfHpFlat:30, desc:'ATK×2.0 damage + lose 30 HP (can be fatal)'},
       {name:'Blood Donation', mp:15, type:'revive_self_dmg', target:'ally_ko', selfHpFlat:70, revivePct:0.38, desc:'Lose 70 HP to revive a KO\'d ally at 38% HP (can be fatal)'},
-      {name:'Push to Prod', mp:20, type:'dmg_self_stun', target:'enemy', formula:2.5, selfStunChance:0.20, desc:'Heavy damage (ATK×2.5) + 20% chance self Stun'},
+      {name:'Dessert for Dinner', mp:15, type:'heal_self', target:'self', amount:65, desc:'Recover 65 HP to self'},
     ]
   },
   {
@@ -1147,7 +1147,7 @@ function confirmSquad() {
       id: ch.id, name: ch.name, role: ch.role,
       maxHp: ch.hp, hp: ch.hp,
       maxMp: ch.mp, mp: ch.mp,
-      atk: ch.atk, baseAtk: ch.atk,
+      atk: ch.atk,
       skills: ch.skills,
       status: [], // {type, duration}
       ko: false,
@@ -1197,10 +1197,6 @@ function buildReorderSlots() {
     slot.onclick = () => reorderTap(i);
     container.appendChild(slot);
   });
-  G.party.forEach((ch, i) => {
-    const canvas = document.getElementById('reorder-sprite-'+i);
-    if (canvas && SPRITES[ch.id]) drawSprite(canvas, SPRITES[ch.id], 2);
-  });
 }
 
 function reorderTap(idx) {
@@ -1231,7 +1227,6 @@ function startRotation() {
       maxHp: Math.floor(base.hp * G.mult),
       hp: Math.floor(base.hp * G.mult),
       atk: Math.floor(base.atk * G.mult),
-      baseAtk: Math.floor(base.atk * G.mult),
       status: [],
       isBoss: base.isBoss || false,
       stunImmune: base.stunImmune || false,
@@ -1682,8 +1677,10 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
     if (!en.dead && !en.stunImmune) {
       applyStatus(en, 'stun', 1);
       addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage and Stuns!`, 'debuff');
-    } else {
+    } else if (!en.dead) {
       addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage. (Stun immune)`, 'damage');
+    } else {
+      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg} damage!`, 'damage');
     }
   }
   else if (t === 'aoe_dmg') {
@@ -1822,18 +1819,6 @@ function executeSkill(charIdx, skillIdx, targetIdx, extra) {
       addLog(`${ch.name} uses ${sk.name} — hits ${en.name} for ${dmg}, but collapses from exhaustion!`, 'ko');
     } else {
       addLog(`${ch.name} uses ${sk.name} — hits ${en.name} for ${dmg}, loses ${selfCost} HP!`, 'damage');
-    }
-  }
-  else if (t === 'dmg_self_stun') {
-    const en = G.enemies[targetIdx];
-    const dmg = calcDamage(ch, en, sk.formula);
-    dealDamageToEnemy(targetIdx, dmg);
-    floatNumber(dmg, 'enemy-card-'+targetIdx, 'damage');
-    if (Math.random() < sk.selfStunChance) {
-      applyStatus(ch, 'stun', 1);
-      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}... but it broke in prod! Stunned!`, 'debuff');
-    } else {
-      addLog(`${ch.name} uses ${sk.name} on ${en.name} for ${dmg}! Deployed successfully.`, 'damage');
     }
   }
   else if (t === 'dmg_bonus') {
@@ -2818,7 +2803,7 @@ const CHAR_SUMMARIES = {
   shaun:     { summary: "The squad's defensive anchor. Self-heals to stay alive, applies Attack Down to weaken enemies with Output Tax, and shields the whole party with Tax Treaty. Slow but nearly impossible to kill.", role: "Tank / Debuffer" },
   arif:      { summary: "AOE controller who weakens the entire enemy formation. Publicity Campaign and Survey both hit all enemies, setting up President's Challenge drain for maximum recovery.", role: "AOE Debuffer / Drain" },
   bethany:   { summary: "AOE damage dealer who can also disrupt enemies and spot-heal allies. Fragile but versatile. Best in multi-enemy rotations.", role: "AOE / Utility" },
-  jiawei:    { summary: "Glass cannon who pays HP to fight. Caffeine Overload costs a flat 20 HP — manageable early, dangerous late. Blood Donation revives a fallen ally for 70 HP of his own — heroic but potentially fatal. Push to Prod hits hardest of all but risks self-stun. Manage his health carefully.", role: "Attacker / High-risk / Reviver" },
+  jiawei:    { summary: "Glass cannon who manages his own HP as a resource. Caffeine Overload hits hard but costs 30 HP per cast. Dessert for Dinner patches him back up. Blood Donation is the dramatic last resort — sacrifices his own HP to revive a fallen ally. Keep the loop going.", role: "Attacker / Self-sustain / Reviver" },
   richmond:  { summary: "Setup debuffer whose combo skill (Audit Finding then Impose Penalty) deals massive bonus damage. Rewards patient play.", role: "Debuffer / Attacker" },
   angel:     { summary: "The squad's MP battery who can also deal damage. Procurement Request keeps allies casting, Dinner and Dance patches the whole party, and Omelette Bomb deals damage while making enemies more vulnerable.", role: "Support / Attacker" },
   jasper:    { summary: "Stun-damage dealer who protects a key ally and revives fallen ones. Rejected by MOF hits hard with a stun, Violet Defence guards your most vulnerable officer, Undying Project pulls someone back from KO.", role: "Attacker / Support / Reviver" },
