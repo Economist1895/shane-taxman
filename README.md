@@ -1,10 +1,12 @@
 # Shane the Taxman
 
-A single-file turn-based browser RPG. No dependencies, no build step — just open the HTML file and play.
+A single-file turn-based browser RPG. No dependencies, no build step — just open in a browser and play.
+
+**Play now: https://economist1895.github.io/shane-taxman/**
 
 ## How to play
 
-Open `shane-the-taxman.html` in any modern browser.
+Open `index.html` in any modern browser, or visit the link above.
 
 Shane Ong commands from the sidelines. Pick 3 officers from a roster of 11, set your party order, and fight through 3 rotations of bureaucratic combat. HP carries over between rotations. MP partially restores.
 
