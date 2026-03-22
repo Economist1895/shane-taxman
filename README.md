@@ -1,17 +1,14 @@
 # Shane the Taxman
-
-A single-file turn-based browser RPG. No dependencies, no build step — just open in a browser and play.
+A turn-based browser RPG. No dependencies, no build step — just open in a browser and play.
 
 **Play now: https://economist1895.github.io/shane-taxman/**
 
 ## How to play
-
-Open `index.html` in any modern browser, or visit the link above.
+Open `index.html` in any modern browser, or visit the link above. Make sure `sprites.png` is in the same directory.
 
 Shane Ong commands from the sidelines. Pick 3 officers from a roster of 11, set your party order, and fight through 3 rotations of bureaucratic combat. HP carries over between rotations. MP partially restores.
 
 ## Features
-
 - 11 playable characters with distinct kits
 - 3 difficulty modes (Easy, Normal, Hard)
 - Turn-based combat with status effects, buffs, debuffs, stuns and revives
@@ -20,7 +17,6 @@ Shane Ong commands from the sidelines. Pick 3 officers from a roster of 11, set 
 - Fully responsive — plays on mobile, tablet and desktop
 
 ## Characters
-
 | Name | Role | Identity |
 |------|------|----------|
 | Ryan Li | Investigator | Attacker / Self-sustain |
@@ -36,5 +32,4 @@ Shane Ong commands from the sidelines. Pick 3 officers from a roster of 11, set 
 | Jasper Samuel | Seconded Officer | Attacker / Support / Reviver |
 
 ## Tech
-
-Single HTML file. Vanilla JS, no frameworks. Pixel sprites drawn on `<canvas>`. Fully self-contained — no external dependencies beyond a Google Fonts import for the Press Start 2P typeface.
+Two files: `index.html` and `sprites.png`. Vanilla JS, no frameworks. No external dependencies beyond a Google Fonts import for the Press Start 2P typeface.
