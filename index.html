@@ -249,8 +249,8 @@
   .tag-heal { border-color: #20c040; color: #20c040; }
   .tag-buff { border-color: #f0a000; color: #f0a000; }
   .tag-debuff { border-color: #4040c0; color: #4040c0; }
-  .tag-tank { border-color: #2060e0; color: #2060e0; }
-  .tag-util { border-color: #a040c0; color: #a040c0; }
+  .tag-revive { border-color: #a040c0; color: #a040c0; }
+  .tag-aoe { border-color: #c020c0; color: #c020c0; }
   .mini-stats { display: flex; gap: 4px; font-size: var(--fs); flex-wrap: wrap; }
   .mini-stat { display: flex; align-items: center; gap: 2px; }
   .mini-stat span { color: var(--text-dim); }
@@ -931,7 +931,7 @@ function renderTitleSprites() {
 const CHARACTER_DATA = [
   {
     id:'ryan', name:'Ryan Li', role:'Investigator',
-    tags:['atk','util'],
+    tags:['atk'],
     hp:320, mp:60, atk:85,
     skills:[
       {name:'Battering Ram', mp:20, type:'dmg', target:'enemy', formula:2.5, desc:'ATK×2.5 damage to one enemy'},
@@ -941,7 +941,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'karishma', name:'Karishma Jayakumar', role:'Customer Service Officer',
-    tags:['heal','util'],
+    tags:['heal','revive'],
     hp:260, mp:100, atk:40,
     skills:[
       {name:'"Hi, I\'m Karishma! How can I help you?"', mp:20, type:'aoe_heal', target:'party', amount:70, desc:'Heal all party members (70 HP each)'},
@@ -961,7 +961,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'janus', name:'Janus Chen', role:'Policy Officer',
-    tags:['debuff','buff','atk'],
+    tags:['aoe','debuff','buff'],
     hp:290, mp:85, atk:71,
     skills:[
       {name:'Policy Review', mp:10, type:'debuff', target:'enemy', effect:'atkdown', duration:3, desc:'Attack Down on one enemy (3 turns)'},
@@ -971,7 +971,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'shaun', name:'Shaun Tan', role:'Tax Specialist',
-    tags:['tank','debuff'],
+    tags:['buff','debuff'],
     hp:380, mp:65, atk:60,
     skills:[
       {name:'Sipping Tea', mp:10, type:'heal_self', target:'self', amount:100, desc:'Heal self (100 HP)'},
@@ -981,7 +981,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'arif', name:'Arif Khan', role:'Outreach Officer',
-    tags:['debuff','atk'],
+    tags:['aoe','debuff'],
     hp:300, mp:80, atk:65,
     skills:[
       {name:'Dazzling Infographics', mp:15, type:'aoe_debuff', target:'enemies', effect:'atkdown', duration:2, desc:'Attack Down on all enemies (2 turns)'},
@@ -991,7 +991,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'bethany', name:'Bethany Su', role:'AI Lead',
-    tags:['atk','debuff','heal'],
+    tags:['aoe','debuff','heal'],
     hp:260, mp:95, atk:75,
     skills:[
       {name:'Deploy Bot', mp:15, type:'aoe_dmg', target:'enemies', formula:0.8, desc:'ATK×0.8 damage to all enemies'},
@@ -1001,7 +1001,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'jiawei', name:'Jiawei Tan', role:'Software Developer',
-    tags:['atk','util','heal'],
+    tags:['atk','revive'],
     hp:280, mp:80, atk:90,
     skills:[
       {name:'Caffeine Overload', mp:10, type:'dmg_self_dmg', target:'enemy', formula:2.0, selfHpFlat:30, desc:'ATK×2.0 damage; lose 30 HP (can be fatal)'},
@@ -1011,7 +1011,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'richmond', name:'Richmond Yeo', role:'Auditor',
-    tags:['debuff','atk'],
+    tags:['atk','debuff'],
     hp:290, mp:65, atk:79,
     skills:[
       {name:'Audit Finding', mp:10, type:'debuff', target:'enemy', effect:'dmgup', duration:3, desc:'Damage Received Up on one enemy (3 turns)'},
@@ -1021,7 +1021,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'angel', name:'Angel Jasmine Loh', role:'Procurement Officer',
-    tags:['heal','atk','util'],
+    tags:['heal','buff','debuff'],
     hp:340, mp:95, atk:62,
     skills:[
       {name:'Dinner & Dance', mp:15, type:'aoe_heal', target:'party', amount:40, desc:'Heal all party members (40 HP each)'},
@@ -1031,7 +1031,7 @@ const CHARACTER_DATA = [
   },
   {
     id:'jasper', name:'Jasper Samuel', role:'Seconded Officer',
-    tags:['atk','buff','heal'],
+    tags:['atk','buff','revive'],
     hp:290, mp:80, atk:65,
     skills:[
       {name:'Rejected by MOF', mp:15, type:'dmg_stun', target:'enemy', formula:2.0, desc:'ATK×2.0 damage + Stun target (1 turn)'},
@@ -1254,7 +1254,7 @@ function buildReorderSlots() {
         <div class="reorder-name">${ch.name}</div>
         <div class="reorder-role">${ch.role}${ch.ko ? ' [KO]':''}</div>
       </div>
-      <div style="margin-left:auto;font-size:var(--fs);font-family:'Press Start 2P',monospace;color:${ch.hp/ch.maxHp>0.6?'#40e060':ch.hp/ch.maxHp>0.3?'#f0a000':'#ff4040'}">${ch.hp}/${ch.maxHp}<br><span style="color:${ch.mp/ch.maxMp>0.4?'#4080ff':'#ff6060'}">${ch.mp}/${ch.maxMp} MP</span></div>
+      <div style="margin-left:auto;font-size:var(--fs);font-family:'Press Start 2P',monospace;color:${ch.hp/ch.maxHp>0.6?'#40e060':ch.hp/ch.maxHp>0.3?'#f0a000':'#ff4040'}">${ch.hp}/${ch.maxHp} HP<br><span style="color:${ch.mp/ch.maxMp>0.4?'#4080ff':'#ff6060'}">${ch.mp}/${ch.maxMp} MP</span></div>
     `;
     slot.onclick = () => reorderTap(i);
     container.appendChild(slot);
